@@ -168,13 +168,46 @@ html, body {
 }
 
 /* Waiting Screen */
-#waiting-screen {
+#waiting-screen, #team-screen {
     justify-content: center;
     align-items: center;
 }
 
-.waiting-content {
+.waiting-content, .team-selection-content {
     text-align: center;
+}
+
+.team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 300px;
+    margin: 30px auto 0;
+}
+
+.team-btn {
+    width: 100%;
+    padding: 18px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'Fredoka', sans-serif;
+    background: white;
+    color: var(--primary);
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.team-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.team-btn:active {
+    transform: translateY(0);
 }
 
 .checkmark-circle {
@@ -200,7 +233,7 @@ html, body {
     100% { transform: scale(1); }
 }
 
-.waiting-content h2 {
+.waiting-content h2, .team-selection-content h2 {
     font-size: 2rem;
     margin-bottom: 10px;
 }

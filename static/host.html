@@ -41,6 +41,23 @@
                     <span class="code-label">Spiel-Code:</span>
                     <span class="code-value" id="game-code-display"></span>
                 </div>
+                <div class="team-config">
+                    <label class="team-mode-toggle">
+                        <input type="checkbox" id="team-mode-checkbox">
+                        <span>Team-Modus aktivieren</span>
+                    </label>
+                    <div id="team-settings" class="team-settings" style="display: none;">
+                        <div class="team-input-group">
+                            <label>Teams (komma-getrennt):</label>
+                            <input type="text" id="teams-input" placeholder="z.B. Team Rot, Team Blau, Team Grün">
+                        </div>
+                        <div class="team-input-group">
+                            <label>Top-Spieler pro Team:</label>
+                            <input type="number" id="top-n-input" value="3" min="1" max="10">
+                        </div>
+                        <button id="save-teams-btn" class="btn-save-teams">Teams speichern</button>
+                    </div>
+                </div>
             </div>
             <div class="players-section">
                 <h3>Spieler (<span id="player-count">0</span>)</h3>

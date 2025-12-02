@@ -207,6 +207,76 @@ html, body {
     text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
 }
 
+.team-config {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+}
+
+.team-mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.team-mode-toggle input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.team-settings {
+    margin-top: 15px;
+}
+
+.team-input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.team-input-group label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    opacity: 0.9;
+}
+
+.team-input-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.team-input-group input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.btn-save-teams {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent-green);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 10px;
+}
+
+.btn-save-teams:hover {
+    transform: translateY(-2px);
+}
+
 .players-section {
     flex: 1;
     display: flex;
@@ -227,6 +297,19 @@ html, body {
     overflow-y: auto;
 }
 
+.team-header {
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 10px 0;
+    margin-top: 10px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+
+.team-header.no-team {
+    opacity: 0.6;
+}
+
 .player-chip {
     background: var(--gradient-3);
     padding: 15px 25px;
@@ -234,6 +317,11 @@ html, body {
     font-size: 1.3rem;
     font-weight: 500;
     animation: popIn 0.3s ease;
+}
+
+.player-chip.no-team {
+    opacity: 0.7;
+    background: var(--gradient-2);
 }
 
 @keyframes popIn {

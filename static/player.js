@@ -8,6 +8,7 @@ let timerInterval = null;
 // DOM Elements
 const screens = {
     join: document.getElementById('join-screen'),
+    team: document.getElementById('team-screen'),
     waiting: document.getElementById('waiting-screen'),
     starting: document.getElementById('starting-screen'),
     question: document.getElementById('question-screen'),
@@ -21,6 +22,7 @@ const elements = {
     playerNameInput: document.getElementById('player-name'),
     joinBtn: document.getElementById('join-btn'),
     errorMessage: document.getElementById('error-message'),
+    teamList: document.getElementById('team-list'),
     waitingQuizTitle: document.getElementById('waiting-quiz-title'),
     startCountdown: document.getElementById('start-countdown'),
     questionNumber: document.getElementById('question-number'),
@@ -109,7 +111,37 @@ socket.on('error', (data) => {
 socket.on('joined_game', (data) => {
     gameCode = data.code;
     elements.waitingQuizTitle.textContent = data.quiz_title;
-    showScreen('waiting');
+    
+    // If team mode is enabled, show team selection
+    if (data.team_mode && data.teams && data.teams.length > 0) {
+        showTeamSelection(data.teams);
+    } else {
+        showScreen('waiting');
+    }
+});
+
+function showTeamSelection(teams) {
+    elements.teamList.innerHTML = '';
+    teams.forEach(team => {
+        const teamBtn = document.createElement('button');
+        teamBtn.className = 'team-btn';
+        teamBtn.textContent = team;
+        teamBtn.addEventListener('click', () => {
+            socket.emit('select_team', { code: gameCode, team: team });
+            showScreen('waiting');
+        });
+        elements.teamList.appendChild(teamBtn);
+    });
+    showScreen('team');
+}
+
+socket.on('team_config_updated', (data) => {
+    // If team mode was enabled after joining, show team selection
+    if (data.team_mode && data.teams && data.teams.length > 0) {
+        if (screens.waiting.classList.contains('active')) {
+            showTeamSelection(data.teams);
+        }
+    }
 });
 
 socket.on('game_starting', () => {
@@ -215,6 +247,7 @@ socket.on('game_ended', (data) => {
     const myName = elements.playerNameInput.value.trim();
     const myRank = leaderboard.findIndex(p => p.name.toLowerCase() === myName.toLowerCase()) + 1;
     const myScore = leaderboard.find(p => p.name.toLowerCase() === myName.toLowerCase())?.score || 0;
+    const myTeam = leaderboard.find(p => p.name.toLowerCase() === myName.toLowerCase())?.team;
     
     let rankEmoji = '';
     if (myRank === 1) rankEmoji = '🥇';
@@ -222,8 +255,13 @@ socket.on('game_ended', (data) => {
     else if (myRank === 3) rankEmoji = '🥉';
     else rankEmoji = `#${myRank}`;
     
+    let finalText = `${myScore} Punkte`;
+    if (data.team_mode && myTeam) {
+        finalText += ` (Team: ${myTeam})`;
+    }
+    
     elements.finalRank.textContent = rankEmoji;
-    elements.finalScore.textContent = `${myScore} Punkte`;
+    elements.finalScore.textContent = finalText;
     
     showScreen('final');
 });

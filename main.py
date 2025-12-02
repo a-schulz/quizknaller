@@ -127,6 +127,9 @@ async def create_game(sid, data):
         "state": "lobby",  # lobby, question, results, leaderboard, ended
         "answers": {},
         "question_start_time": None,
+        "team_mode": False,
+        "teams": [],
+        "top_n_players": 3,
     }
     
     await sio.enter_room(sid, game_code)
@@ -167,16 +170,19 @@ async def join_game(sid, data):
         "name": player_name,
         "score": 0,
         "streak": 0,
+        "team": None,
     }
     
     await sio.enter_room(sid, game_code)
     await sio.emit("joined_game", {
         "code": game_code,
-        "quiz_title": game["quiz"]["title"]
+        "quiz_title": game["quiz"]["title"],
+        "team_mode": game["team_mode"],
+        "teams": game["teams"]
     }, to=sid)
     
     # Notify host
-    player_list = [{"name": p["name"], "score": p["score"]} for p in game["players"].values()]
+    player_list = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
     await sio.emit("player_joined", {
         "name": player_name,
         "players": player_list
@@ -399,6 +405,69 @@ async def show_results(game_code: str):
 
 
 @sio.event
+async def configure_teams(sid, data):
+    """Host configures team mode."""
+    game_code = data.get("code")
+    team_mode = data.get("team_mode", False)
+    teams = data.get("teams", [])
+    top_n_players = data.get("top_n_players", 3)
+    
+    if game_code not in games:
+        return
+    
+    game = games[game_code]
+    
+    if game["host_sid"] != sid:
+        return
+    
+    if game["state"] != "lobby":
+        return
+    
+    game["team_mode"] = team_mode
+    game["teams"] = teams
+    game["top_n_players"] = top_n_players
+    
+    # Notify all players about team mode update
+    await sio.emit("team_config_updated", {
+        "team_mode": team_mode,
+        "teams": teams
+    }, room=game_code)
+
+
+@sio.event
+async def select_team(sid, data):
+    """Player selects their team."""
+    game_code = data.get("code")
+    team = data.get("team")
+    
+    if game_code not in games:
+        return
+    
+    game = games[game_code]
+    
+    if sid not in game["players"]:
+        return
+    
+    if game["state"] != "lobby":
+        return
+    
+    if not game["team_mode"]:
+        return
+    
+    if team not in game["teams"]:
+        await sio.emit("error", {"message": "Ungültiges Team"}, to=sid)
+        return
+    
+    game["players"][sid]["team"] = team
+    
+    # Notify host and all players
+    player_list = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+    await sio.emit("player_updated", {
+        "players": player_list
+    }, room=game_code)
+
+
+@sio.event
 async def next_question_request(sid, data):
     """Host requests next question."""
     game_code = data.get("code")
@@ -424,13 +493,42 @@ async def end_game(game_code: str):
     
     # Final leaderboard
     leaderboard = [
-        {"name": p["name"], "score": p["score"]}
+        {"name": p["name"], "score": p["score"], "team": p["team"]}
         for p in game["players"].values()
     ]
     leaderboard.sort(key=lambda x: x["score"], reverse=True)
     
+    # Calculate team leaderboard if team mode is enabled
+    team_leaderboard = []
+    if game["team_mode"]:
+        team_scores = {}
+        for team in game["teams"]:
+            # Get all players in this team
+            team_players = [
+                {"name": p["name"], "score": p["score"]}
+                for p in game["players"].values()
+                if p["team"] == team
+            ]
+            # Sort by score and take top N players
+            team_players.sort(key=lambda x: x["score"], reverse=True)
+            top_players = team_players[:game["top_n_players"]]
+            # Sum scores of top players
+            team_total = sum(p["score"] for p in top_players)
+            team_scores[team] = {
+                "team": team,
+                "score": team_total,
+                "player_count": len(team_players),
+                "top_players": top_players
+            }
+        
+        team_leaderboard = list(team_scores.values())
+        team_leaderboard.sort(key=lambda x: x["score"], reverse=True)
+    
     await sio.emit("game_ended", {
-        "leaderboard": leaderboard
+        "leaderboard": leaderboard,
+        "team_mode": game["team_mode"],
+        "team_leaderboard": team_leaderboard,
+        "top_n_players": game["top_n_players"]
     }, room=game_code)
 
 

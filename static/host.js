@@ -26,6 +26,11 @@ const elements = {
     playerCount: document.getElementById('player-count'),
     playersGrid: document.getElementById('players-grid'),
     startGameBtn: document.getElementById('start-game-btn'),
+    teamModeCheckbox: document.getElementById('team-mode-checkbox'),
+    teamSettings: document.getElementById('team-settings'),
+    teamsInput: document.getElementById('teams-input'),
+    topNInput: document.getElementById('top-n-input'),
+    saveTeamsBtn: document.getElementById('save-teams-btn'),
     countdownNumber: document.getElementById('countdown-number'),
     questionNumber: document.getElementById('question-number'),
     timerProgress: document.getElementById('timer-progress'),
@@ -77,6 +82,47 @@ elements.startGameBtn.addEventListener('click', () => {
     socket.emit('start_game', { code: gameCode });
 });
 
+elements.teamModeCheckbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        elements.teamSettings.style.display = 'block';
+    } else {
+        elements.teamSettings.style.display = 'none';
+        // Disable team mode
+        socket.emit('configure_teams', {
+            code: gameCode,
+            team_mode: false,
+            teams: [],
+            top_n_players: 3
+        });
+    }
+});
+
+elements.saveTeamsBtn.addEventListener('click', () => {
+    const teamsText = elements.teamsInput.value.trim();
+    const topN = parseInt(elements.topNInput.value) || 3;
+    
+    if (!teamsText) {
+        alert('Bitte geben Sie mindestens ein Team ein');
+        return;
+    }
+    
+    const teams = teamsText.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    
+    if (teams.length < 2) {
+        alert('Bitte geben Sie mindestens 2 Teams ein');
+        return;
+    }
+    
+    socket.emit('configure_teams', {
+        code: gameCode,
+        team_mode: true,
+        teams: teams,
+        top_n_players: topN
+    });
+    
+    alert('Team-Konfiguration gespeichert!');
+});
+
 elements.nextQuestionBtn.addEventListener('click', () => {
     socket.emit('next_question_request', { code: gameCode });
 });
@@ -102,16 +148,127 @@ socket.on('game_created', (data) => {
 
 socket.on('player_joined', (data) => {
     elements.playersGrid.innerHTML = '';
-    data.players.forEach(player => {
-        const chip = document.createElement('div');
-        chip.className = 'player-chip';
-        chip.textContent = player.name;
-        elements.playersGrid.appendChild(chip);
-    });
+    
+    // Group players by team if team mode is active
+    const teamMode = data.players.some(p => p.team !== null && p.team !== undefined);
+    
+    if (teamMode) {
+        // Group players by team
+        const teams = {};
+        const noTeam = [];
+        
+        data.players.forEach(player => {
+            if (player.team) {
+                if (!teams[player.team]) teams[player.team] = [];
+                teams[player.team].push(player);
+            } else {
+                noTeam.push(player);
+            }
+        });
+        
+        // Display teams
+        Object.keys(teams).forEach(teamName => {
+            const teamHeader = document.createElement('div');
+            teamHeader.className = 'team-header';
+            teamHeader.textContent = teamName;
+            elements.playersGrid.appendChild(teamHeader);
+            
+            teams[teamName].forEach(player => {
+                const chip = document.createElement('div');
+                chip.className = 'player-chip';
+                chip.textContent = player.name;
+                elements.playersGrid.appendChild(chip);
+            });
+        });
+        
+        // Display players without team
+        if (noTeam.length > 0) {
+            const teamHeader = document.createElement('div');
+            teamHeader.className = 'team-header no-team';
+            teamHeader.textContent = 'Kein Team';
+            elements.playersGrid.appendChild(teamHeader);
+            
+            noTeam.forEach(player => {
+                const chip = document.createElement('div');
+                chip.className = 'player-chip no-team';
+                chip.textContent = player.name;
+                elements.playersGrid.appendChild(chip);
+            });
+        }
+    } else {
+        // Normal display
+        data.players.forEach(player => {
+            const chip = document.createElement('div');
+            chip.className = 'player-chip';
+            chip.textContent = player.name;
+            elements.playersGrid.appendChild(chip);
+        });
+    }
     
     totalPlayers = data.players.length;
     elements.playerCount.textContent = totalPlayers;
     elements.startGameBtn.disabled = totalPlayers < 1;
+});
+
+socket.on('player_updated', (data) => {
+    // Reuse the player_joined logic
+    socket.emit('__dummy__');
+    const event = { players: data.players };
+    document.dispatchEvent(new CustomEvent('player_joined', { detail: event }));
+    
+    // Update display manually
+    elements.playersGrid.innerHTML = '';
+    
+    const teamMode = data.players.some(p => p.team !== null && p.team !== undefined);
+    
+    if (teamMode) {
+        const teams = {};
+        const noTeam = [];
+        
+        data.players.forEach(player => {
+            if (player.team) {
+                if (!teams[player.team]) teams[player.team] = [];
+                teams[player.team].push(player);
+            } else {
+                noTeam.push(player);
+            }
+        });
+        
+        Object.keys(teams).forEach(teamName => {
+            const teamHeader = document.createElement('div');
+            teamHeader.className = 'team-header';
+            teamHeader.textContent = teamName;
+            elements.playersGrid.appendChild(teamHeader);
+            
+            teams[teamName].forEach(player => {
+                const chip = document.createElement('div');
+                chip.className = 'player-chip';
+                chip.textContent = player.name;
+                elements.playersGrid.appendChild(chip);
+            });
+        });
+        
+        if (noTeam.length > 0) {
+            const teamHeader = document.createElement('div');
+            teamHeader.className = 'team-header no-team';
+            teamHeader.textContent = 'Kein Team';
+            elements.playersGrid.appendChild(teamHeader);
+            
+            noTeam.forEach(player => {
+                const chip = document.createElement('div');
+                chip.className = 'player-chip no-team';
+                chip.textContent = player.name;
+                elements.playersGrid.appendChild(chip);
+            });
+        }
+    } else {
+        data.players.forEach(player => {
+            const chip = document.createElement('div');
+            chip.className = 'player-chip';
+            chip.textContent = player.name;
+            elements.playersGrid.appendChild(chip);
+        });
+    }
 });
 
 socket.on('player_left', (data) => {
@@ -244,38 +401,74 @@ socket.on('game_ended', (data) => {
     
     const leaderboard = data.leaderboard;
     
-    // Create podium
-    elements.podium.innerHTML = '';
-    const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd
-    const medals = ['🥇', '🥈', '🥉'];
-    const standClasses = ['second', 'first', 'third'];
-    
-    podiumOrder.forEach((rank, displayOrder) => {
-        if (leaderboard[rank]) {
-            const place = document.createElement('div');
-            place.className = 'podium-place';
-            place.innerHTML = `
-                <div class="podium-avatar">${medals[rank]}</div>
-                <div class="podium-name">${leaderboard[rank].name}</div>
-                <div class="podium-score">${leaderboard[rank].score} Punkte</div>
-                <div class="podium-stand ${standClasses[displayOrder]}">${rank + 1}</div>
+    // If team mode, show team leaderboard first
+    if (data.team_mode && data.team_leaderboard && data.team_leaderboard.length > 0) {
+        // Create team podium
+        elements.podium.innerHTML = '<h2 style="text-align: center; margin-bottom: 20px;">Team-Rangliste</h2>';
+        const teamPodiumOrder = [1, 0, 2];
+        const medals = ['🥇', '🥈', '🥉'];
+        const standClasses = ['second', 'first', 'third'];
+        
+        teamPodiumOrder.forEach((rank, displayOrder) => {
+            if (data.team_leaderboard[rank]) {
+                const place = document.createElement('div');
+                place.className = 'podium-place';
+                place.innerHTML = `
+                    <div class="podium-avatar">${medals[rank]}</div>
+                    <div class="podium-name">${data.team_leaderboard[rank].team}</div>
+                    <div class="podium-score">${data.team_leaderboard[rank].score} Punkte</div>
+                    <div class="podium-stand ${standClasses[displayOrder]}">${rank + 1}</div>
+                `;
+                elements.podium.appendChild(place);
+            }
+        });
+        
+        // Show individual leaderboard
+        elements.fullLeaderboard.innerHTML = '<h3 style="text-align: center; margin: 20px 0;">Individuelle Rangliste</h3>';
+        leaderboard.forEach((player, i) => {
+            const item = document.createElement('div');
+            item.className = 'final-leaderboard-item';
+            item.innerHTML = `
+                <span class="rank">${i + 1}.</span>
+                <span class="name">${player.name}${player.team ? ` (${player.team})` : ''}</span>
+                <span class="score">${player.score}</span>
             `;
-            elements.podium.appendChild(place);
-        }
-    });
-    
-    // Full leaderboard (rest of players)
-    elements.fullLeaderboard.innerHTML = '';
-    leaderboard.slice(3).forEach((player, i) => {
-        const item = document.createElement('div');
-        item.className = 'final-leaderboard-item';
-        item.innerHTML = `
-            <span class="rank">${i + 4}.</span>
-            <span class="name">${player.name}</span>
-            <span class="score">${player.score}</span>
-        `;
-        elements.fullLeaderboard.appendChild(item);
-    });
+            elements.fullLeaderboard.appendChild(item);
+        });
+    } else {
+        // Normal individual podium
+        elements.podium.innerHTML = '';
+        const podiumOrder = [1, 0, 2];
+        const medals = ['🥇', '🥈', '🥉'];
+        const standClasses = ['second', 'first', 'third'];
+        
+        podiumOrder.forEach((rank, displayOrder) => {
+            if (leaderboard[rank]) {
+                const place = document.createElement('div');
+                place.className = 'podium-place';
+                place.innerHTML = `
+                    <div class="podium-avatar">${medals[rank]}</div>
+                    <div class="podium-name">${leaderboard[rank].name}</div>
+                    <div class="podium-score">${leaderboard[rank].score} Punkte</div>
+                    <div class="podium-stand ${standClasses[displayOrder]}">${rank + 1}</div>
+                `;
+                elements.podium.appendChild(place);
+            }
+        });
+        
+        // Full leaderboard (rest of players)
+        elements.fullLeaderboard.innerHTML = '';
+        leaderboard.slice(3).forEach((player, i) => {
+            const item = document.createElement('div');
+            item.className = 'final-leaderboard-item';
+            item.innerHTML = `
+                <span class="rank">${i + 4}.</span>
+                <span class="name">${player.name}</span>
+                <span class="score">${player.score}</span>
+            `;
+            elements.fullLeaderboard.appendChild(item);
+        });
+    }
     
     // Create confetti
     createConfetti();
