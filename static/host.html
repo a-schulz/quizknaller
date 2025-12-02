@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizKnaller 💥 - Host</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/host.css">
+</head>
+<body>
+    <!-- Select Quiz Screen -->
+    <div id="select-screen" class="screen active">
+        <div class="select-container">
+            <div class="logo-section">
+                <h1 class="logo">Quiz<span>Knaller</span></h1>
+                <p class="tagline">Wissen macht BUMM! 💥</p>
+            </div>
+            <h2>Quiz auswählen</h2>
+            <div id="quiz-list" class="quiz-list"></div>
+        </div>
+    </div>
+
+    <!-- Lobby Screen -->
+    <div id="lobby-screen" class="screen">
+        <div class="lobby-header">
+            <div class="logo-small">Quiz<span>Knaller</span></div>
+            <div class="quiz-info">
+                <span id="lobby-quiz-title"></span>
+            </div>
+        </div>
+        <div class="lobby-main">
+            <div class="join-info">
+                <div class="qr-code-container">
+                    <img id="qr-code" src="" alt="QR Code" class="qr-code">
+                </div>
+                <p>Beitreten auf</p>
+                <div class="join-url" id="join-url"></div>
+                <div class="game-code-display">
+                    <span class="code-label">Spiel-Code:</span>
+                    <span class="code-value" id="game-code-display"></span>
+                </div>
+            </div>
+            <div class="players-section">
+                <h3>Spieler (<span id="player-count">0</span>)</h3>
+                <div class="players-grid" id="players-grid"></div>
+            </div>
+        </div>
+        <div class="lobby-footer">
+            <button id="start-game-btn" class="btn-start" disabled>Spiel starten 🚀</button>
+        </div>
+    </div>
+
+    <!-- Countdown Screen -->
+    <div id="countdown-screen" class="screen">
+        <div class="countdown-container">
+            <h2>Macht euch bereit!</h2>
+            <div class="big-countdown" id="countdown-number">3</div>
+        </div>
+    </div>
+
+    <!-- Question Screen -->
+    <div id="question-screen" class="screen">
+        <div class="question-header">
+            <div class="question-info">
+                <span class="question-number" id="question-number">Frage 1 von 10</span>
+            </div>
+            <div class="timer-section">
+                <div class="timer-circle" id="timer-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="timer-bg" cx="50" cy="50" r="45"/>
+                        <circle class="timer-progress" id="timer-progress" cx="50" cy="50" r="45"/>
+                    </svg>
+                    <span class="timer-text" id="timer-text">20</span>
+                </div>
+            </div>
+            <div class="answer-count">
+                <span id="answered-count">0</span> / <span id="total-players">0</span>
+                <small>Antworten</small>
+            </div>
+        </div>
+        <div class="question-main">
+            <h1 class="question-text" id="question-text"></h1>
+        </div>
+        <div class="answers-display" id="answers-display">
+            <div class="answer-option answer-0">
+                <span class="answer-icon">▲</span>
+                <span class="answer-text" id="answer-0"></span>
+            </div>
+            <div class="answer-option answer-1">
+                <span class="answer-icon">◆</span>
+                <span class="answer-text" id="answer-1"></span>
+            </div>
+            <div class="answer-option answer-2">
+                <span class="answer-icon">●</span>
+                <span class="answer-text" id="answer-2"></span>
+            </div>
+            <div class="answer-option answer-3">
+                <span class="answer-icon">■</span>
+                <span class="answer-text" id="answer-3"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen">
+        <div class="results-header">
+            <h2>Auflösung</h2>
+        </div>
+        <div class="results-main">
+            <div class="correct-answer-display">
+                <span class="correct-label">Richtige Antwort:</span>
+                <div class="correct-answer-box" id="correct-answer-box"></div>
+            </div>
+            <div class="answer-stats" id="answer-stats">
+                <div class="stat-bar stat-0">
+                    <div class="stat-fill" id="stat-fill-0"></div>
+                    <span class="stat-icon">▲</span>
+                    <span class="stat-count" id="stat-count-0">0</span>
+                </div>
+                <div class="stat-bar stat-1">
+                    <div class="stat-fill" id="stat-fill-1"></div>
+                    <span class="stat-icon">◆</span>
+                    <span class="stat-count" id="stat-count-1">0</span>
+                </div>
+                <div class="stat-bar stat-2">
+                    <div class="stat-fill" id="stat-fill-2"></div>
+                    <span class="stat-icon">●</span>
+                    <span class="stat-count" id="stat-count-2">0</span>
+                </div>
+                <div class="stat-bar stat-3">
+                    <div class="stat-fill" id="stat-fill-3"></div>
+                    <span class="stat-icon">■</span>
+                    <span class="stat-count" id="stat-count-3">0</span>
+                </div>
+            </div>
+            <div class="leaderboard-preview" id="leaderboard-preview"></div>
+        </div>
+        <div class="results-footer">
+            <button id="next-question-btn" class="btn-next">Weiter ➜</button>
+        </div>
+    </div>
+
+    <!-- Final Leaderboard Screen -->
+    <div id="final-screen" class="screen">
+        <div class="final-container">
+            <div class="confetti-container" id="confetti"></div>
+            <h1 class="final-title">🏆 Endergebnis 🏆</h1>
+            <div class="podium" id="podium"></div>
+            <div class="full-leaderboard" id="full-leaderboard"></div>
+            <button id="new-game-btn" class="btn-new-game">Neues Spiel 🔄</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/static/host.js"></script>
+</body>
+</html>

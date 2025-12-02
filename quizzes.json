@@ -1,0 +1,125 @@
+[
+  {
+    "title": "Allgemeinwissen Knaller 💥",
+    "questions": [
+      {
+        "question": "Welches ist das größte Land der Welt?",
+        "answers": ["China", "USA", "Russland", "Kanada"],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Wie viele Planeten hat unser Sonnensystem?",
+        "answers": ["7", "8", "9", "10"],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches chemische Element hat das Symbol 'Au'?",
+        "answers": ["Silber", "Aluminium", "Gold", "Kupfer"],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "In welchem Jahr fiel die Berliner Mauer?",
+        "answers": ["1987", "1989", "1990", "1991"],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches Tier ist das schnellste an Land?",
+        "answers": ["Löwe", "Gepard", "Pferd", "Antilope"],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie heißt die Hauptstadt von Australien?",
+        "answers": ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Wer malte die Mona Lisa?",
+        "answers": ["Michelangelo", "Leonardo da Vinci", "Raphael", "Rembrandt"],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Wie viele Bundesländer hat Deutschland?",
+        "answers": ["14", "15", "16", "17"],
+        "correct": 2,
+        "time_limit": 15
+      }
+    ]
+  },
+  {
+    "title": "Technik & Internet Quiz 🖥️",
+    "questions": [
+      {
+        "question": "Wer gründete Microsoft?",
+        "answers": ["Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Elon Musk"],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wofür steht 'HTML'?",
+        "answers": ["HyperText Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlink Text Machine Language"],
+        "correct": 0,
+        "time_limit": 20
+      },
+      {
+        "question": "In welchem Jahr wurde das erste iPhone vorgestellt?",
+        "answers": ["2005", "2006", "2007", "2008"],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches Unternehmen entwickelte Android?",
+        "answers": ["Apple", "Microsoft", "Google", "Samsung"],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Was bedeutet 'CPU'?",
+        "answers": ["Central Processing Unit", "Computer Personal Unit", "Central Program Utility", "Core Processing Unit"],
+        "correct": 0,
+        "time_limit": 20
+      }
+    ]
+  },
+  {
+    "title": "Musik & Film Spektakel 🎬",
+    "questions": [
+      {
+        "question": "Welche Band sang 'Bohemian Rhapsody'?",
+        "answers": ["The Beatles", "Led Zeppelin", "Queen", "Pink Floyd"],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wer spielte Jack in 'Titanic'?",
+        "answers": ["Brad Pitt", "Leonardo DiCaprio", "Tom Cruise", "Johnny Depp"],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Jahr erschien der erste Harry Potter Film?",
+        "answers": ["1999", "2000", "2001", "2002"],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Wer ist der 'King of Pop'?",
+        "answers": ["Elvis Presley", "Michael Jackson", "Prince", "Freddie Mercury"],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Film gewann 2020 den Oscar für den besten Film?",
+        "answers": ["1917", "Joker", "Parasite", "Once Upon a Time in Hollywood"],
+        "correct": 2,
+        "time_limit": 20
+      }
+    ]
+  }
+]

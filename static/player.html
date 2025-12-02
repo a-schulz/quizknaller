@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QuizKnaller 💥 - Wissen macht BUMM!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/player.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Join Screen -->
+        <div id="join-screen" class="screen active">
+            <div class="logo-section">
+                <h1 class="logo">Quiz<span>Knaller</span></h1>
+                <p class="tagline">Wissen macht BUMM! 💥</p>
+            </div>
+            <div class="join-form">
+                <div class="input-group">
+                    <input type="text" id="game-code" placeholder="Spiel-Code" maxlength="6" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="player-name" placeholder="Dein Name" maxlength="20" autocomplete="off">
+                </div>
+                <button id="join-btn" class="btn-primary">Beitreten 🚀</button>
+            </div>
+            <div id="error-message" class="error-message"></div>
+        </div>
+
+        <!-- Waiting Screen -->
+        <div id="waiting-screen" class="screen">
+            <div class="waiting-content">
+                <div class="checkmark-circle">
+                    <span class="checkmark">✓</span>
+                </div>
+                <h2>Du bist dabei!</h2>
+                <p class="quiz-title" id="waiting-quiz-title"></p>
+                <div class="pulse-text">Warte auf den Start...</div>
+            </div>
+        </div>
+
+        <!-- Starting Screen -->
+        <div id="starting-screen" class="screen">
+            <div class="countdown-content">
+                <h2>Es geht los!</h2>
+                <div class="big-countdown" id="start-countdown">3</div>
+            </div>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="question-screen" class="screen">
+            <div class="question-header">
+                <span class="question-number" id="question-number">1/10</span>
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timer-fill"></div>
+                </div>
+            </div>
+            <div class="question-text" id="question-text"></div>
+            <div class="answers-grid" id="answers-grid">
+                <button class="answer-btn answer-0" data-index="0"></button>
+                <button class="answer-btn answer-1" data-index="1"></button>
+                <button class="answer-btn answer-2" data-index="2"></button>
+                <button class="answer-btn answer-3" data-index="3"></button>
+            </div>
+        </div>
+
+        <!-- Answered Screen -->
+        <div id="answered-screen" class="screen">
+            <div class="answered-content">
+                <div class="answer-sent">
+                    <span class="sent-icon">📨</span>
+                </div>
+                <h2>Antwort gesendet!</h2>
+                <p>Warte auf die anderen Spieler...</p>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <div class="result-content">
+                <div class="result-icon" id="result-icon">✓</div>
+                <h2 id="result-title">Richtig!</h2>
+                <p class="correct-answer" id="correct-answer"></p>
+                <div class="score-display">
+                    <span class="score-label">Punkte</span>
+                    <span class="score-value" id="score-gained">+0</span>
+                </div>
+                <div class="total-score">
+                    Gesamt: <span id="total-score">0</span>
+                </div>
+                <div class="rank-display" id="rank-display"></div>
+                <div class="streak-display" id="streak-display"></div>
+            </div>
+        </div>
+
+        <!-- Final Screen -->
+        <div id="final-screen" class="screen">
+            <div class="final-content">
+                <h1>🏆 Spiel beendet!</h1>
+                <div class="final-rank" id="final-rank"></div>
+                <div class="final-score" id="final-score"></div>
+                <button id="play-again-btn" class="btn-primary">Nochmal spielen 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/static/player.js"></script>
+</body>
+</html>
