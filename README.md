@@ -13,6 +13,8 @@ Ein Kahoot-ähnliches Quiz-Spiel mit einer mobil-optimierten Spieleransicht und 
 - 🔥 **Streak-Bonus** - Belohnungen für aufeinanderfolgende richtige Antworten
 - 👥 **Team-Modus** - Spieler können in Teams gegeneinander antreten
 - 🏅 **Flexible Team-Wertung** - Host konfiguriert, wie viele Top-Spieler pro Team zählen
+- ▶️ **Autoplay-Modus** - Automatisches Durchlaufen der Fragen für nahtloses Spiel
+- 🎄 **Weihnachtsquiz** - Spezielles Quiz mit 15 Weihnachtsfragen
 - 🏆 **Podium & Konfetti** - Feierliches Spielende
 
 ## Schnellstart
@@ -31,10 +33,17 @@ Der Server startet auf `http://localhost:8000`.
 
 1. **Host:** Öffne `http://localhost:8000/host` auf dem Beamer/Präsentationsgerät
 2. **Spieler:** Öffnen `http://localhost:8000` auf ihren Handys
-3. Wähle ein Quiz aus und teile den Spiel-Code mit den Spielern
+3. Wähle ein Quiz aus (z.B. das neue Weihnachtsquiz 🎄)
 4. **(Optional) Team-Modus:** Aktiviere den Team-Modus, konfiguriere Teams und lege fest, wie viele Top-Spieler pro Team zählen
-5. Spieler treten bei und wählen ggf. ihr Team aus
-6. Sobald alle beigetreten sind, starte das Spiel!
+5. **(Optional) Autoplay:** Aktiviere "Automatisch zur nächsten Frage" für nahtloses Durchlaufen
+6. Spieler treten bei und wählen ggf. ihr Team aus
+7. Sobald alle beigetreten sind, starte das Spiel!
+
+### Autoplay-Modus
+Der Host kann den Autoplay-Modus aktivieren:
+- Checkbox in der Lobby aktivieren
+- Nach jeder Frage wird automatisch nach 5 Sekunden zur nächsten Frage gewechselt
+- Ideal für flüssige Quizabende ohne manuelle Steuerung
 
 ### Team-Modus
 Der Host kann den Team-Modus in der Lobby aktivieren und Teams konfigurieren:

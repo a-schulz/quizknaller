@@ -121,5 +121,100 @@
         "time_limit": 20
       }
     ]
+  },
+  {
+    "title": "Weihnachtsquiz 🎄🎅",
+    "questions": [
+      {
+        "question": "An welchem Tag wird in Deutschland traditionell Weihnachten gefeiert?",
+        "answers": ["24. Dezember", "25. Dezember", "26. Dezember", "6. Dezember"],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie heißen die drei Weisen aus dem Morgenland?",
+        "answers": ["Abraham, Isaak, Jakob", "Caspar, Melchior, Balthasar", "Petrus, Paulus, Johannes", "Adam, Noah, Moses"],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "In welcher Stadt wurde Jesus Christus geboren?",
+        "answers": ["Jerusalem", "Nazareth", "Bethlehem", "Kapernaum"],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Brauch gehört NICHT traditionell zur Weihnachtszeit?",
+        "answers": ["Adventskranz", "Weihnachtsbaum", "Osterfeuer", "Krippe"],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie viele Kerzen hat ein Adventskranz?",
+        "answers": ["3", "4", "5", "6"],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Welches Tier zieht traditionell den Schlitten des Weihnachtsmanns?",
+        "answers": ["Pferde", "Rentiere", "Huskys", "Elche"],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Wie heißt das berühmteste Rentier des Weihnachtsmanns?",
+        "answers": ["Donner", "Blitzen", "Rudolph", "Dasher"],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Heilige ist der Ursprung des Weihnachtsmann-Mythos?",
+        "answers": ["St. Martin", "St. Nikolaus", "St. Franziskus", "St. Stephanus"],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Was bringen die Heiligen Drei Könige dem Jesuskind?",
+        "answers": ["Gold, Weihrauch, Myrrhe", "Silber, Brot, Wein", "Gold, Öl, Gewürze", "Diamanten, Seide, Parfüm"],
+        "correct": 0,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches traditionelle Weihnachtsgebäck wird in Häuserform gebacken?",
+        "answers": ["Stollen", "Lebkuchen", "Zimtsterne", "Spekulatius"],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Land steht der größte natürliche Weihnachtsbaum der Welt?",
+        "answers": ["Deutschland", "Schweden", "USA", "Kanada"],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches Lied beginnt mit 'Stille Nacht, Heilige Nacht'?",
+        "answers": ["O Tannenbaum", "Ihr Kinderlein kommet", "Stille Nacht", "Kling Glöckchen"],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Wann beginnt die Adventszeit?",
+        "answers": ["1. Dezember", "Vierter Sonntag vor Weihnachten", "6. Dezember", "Erster Sonntag im Dezember"],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Was ist ein traditioneller Weihnachtsmarkt-Klassiker?",
+        "answers": ["Glühwein", "Radler", "Eistee", "Limonade"],
+        "correct": 0,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Farben hat der Weihnachtsmann traditionell?",
+        "answers": ["Grün und Gold", "Rot und Weiß", "Blau und Silber", "Braun und Beige"],
+        "correct": 1,
+        "time_limit": 10
+      }
+    ]
   }
 ]

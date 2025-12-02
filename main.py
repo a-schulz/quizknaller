@@ -15,12 +15,17 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+import database as db
+
 # Create Socket.IO server
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 app = FastAPI(title="QuizKnaller", description="Wissen macht BUMM! 💥")
 socket_app = socketio.ASGIApp(sio, other_asgi_app=app)
 
-# Store for active games
+# Initialize database
+db.init_db()
+
+# In-memory cache for active games (with database persistence)
 games: dict[str, dict] = {}
 
 # Load quiz data
@@ -91,19 +96,146 @@ async def connect(sid, environ):
     print(f"Client connected: {sid}")
 
 
+def sync_game_to_db(game_code: str):
+    """Sync in-memory game state to database."""
+    if game_code not in games:
+        return
+    
+    game = games[game_code]
+    db.update_game(
+        game_code,
+        host_sid=game["host_sid"],
+        current_question=game["current_question"],
+        state=game["state"],
+        team_mode=game["team_mode"],
+        teams=game["teams"],
+        top_n_players=game["top_n_players"]
+    )
+
+
+def load_game_from_db(game_code: str) -> bool:
+    """Load game from database into memory."""
+    game_data = db.get_game(game_code)
+    if not game_data:
+        return False
+    
+    # Load players
+    players_data = db.get_players(game_code)
+    players = {}
+    for p in players_data:
+        players[p["session_id"]] = {
+            "name": p["name"],
+            "score": p["score"],
+            "team": p["team"],
+            "streak": 0,  # Reset streak on load
+        }
+    
+    games[game_code] = {
+        "host_sid": game_data["host_sid"],
+        "quiz": game_data["quiz"],
+        "players": players,
+        "current_question": game_data["current_question"],
+        "state": game_data["state"],
+        "answers": {},
+        "question_start_time": None,
+        "team_mode": game_data["team_mode"],
+        "teams": game_data["teams"],
+        "top_n_players": game_data["top_n_players"],
+    }
+    
+    return True
+
+
+@sio.event
+async def reconnect_host(sid, data):
+    """Host reconnects to their game."""
+    game_code = data.get("code")
+    
+    # Try to load from database if not in memory
+    if game_code not in games:
+        if not load_game_from_db(game_code):
+            await sio.emit("reconnect_failed", {"message": "Spiel nicht gefunden"}, to=sid)
+            return
+    
+    game = games[game_code]
+    old_host_sid = game["host_sid"]
+    
+    # Update host SID
+    game["host_sid"] = sid
+    db.update_game(game_code, host_sid=sid)
+    await sio.enter_room(sid, game_code)
+    
+    # Send current game state
+    await sio.emit("reconnected_host", {
+        "code": game_code,
+        "quiz_title": game["quiz"]["title"],
+        "state": game["state"],
+        "current_question": game["current_question"],
+        "players": [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()],
+        "team_mode": game["team_mode"],
+        "teams": game["teams"],
+    }, to=sid)
+
+
+@sio.event
+async def reconnect_player(sid, data):
+    """Player reconnects to their game."""
+    game_code = data.get("code")
+    player_name = data.get("name")
+    
+    # Try to load from database if not in memory
+    if game_code not in games:
+        if not load_game_from_db(game_code):
+            await sio.emit("reconnect_failed", {"message": "Spiel nicht gefunden"}, to=sid)
+            return
+    
+    game = games[game_code]
+    
+    # Find player by name
+    old_sid = None
+    for player_sid, player in game["players"].items():
+        if player["name"].lower() == player_name.lower():
+            old_sid = player_sid
+            break
+    
+    if old_sid is None:
+        await sio.emit("reconnect_failed", {"message": "Spieler nicht gefunden"}, to=sid)
+        return
+    
+    # Transfer player data to new SID
+    player_data = game["players"][old_sid]
+    del game["players"][old_sid]
+    game["players"][sid] = player_data
+    
+    # Update database
+    db.update_player_session(game_code, player_name, sid)
+    
+    # Transfer answer if exists
+    if old_sid in game["answers"]:
+        game["answers"][sid] = game["answers"][old_sid]
+        del game["answers"][old_sid]
+    
+    await sio.enter_room(sid, game_code)
+    
+    # Send current game state
+    await sio.emit("reconnected_player", {
+        "code": game_code,
+        "quiz_title": game["quiz"]["title"],
+        "state": game["state"],
+        "score": player_data["score"],
+        "team": player_data["team"],
+        "team_mode": game["team_mode"],
+        "teams": game["teams"],
+    }, to=sid)
+
+
 @sio.event
 async def disconnect(sid):
     print(f"Client disconnected: {sid}")
-    # Remove player from their game
-    for game_code, game in list(games.items()):
-        if sid in game.get("players", {}):
-            player_name = game["players"][sid]["name"]
-            del game["players"][sid]
-            await sio.emit("player_left", {"name": player_name}, room=game_code)
-        if game.get("host_sid") == sid:
-            # Host left, end the game
-            await sio.emit("game_ended", {"reason": "Host hat das Spiel verlassen"}, room=game_code)
-            del games[game_code]
+    # Mark player as disconnected in database
+    db.set_player_connected(sid, False)
+    # Don't remove player immediately - allow reconnection
+    # Players will be removed after game ends or timeout
 
 
 @sio.event
@@ -118,6 +250,9 @@ async def create_game(sid, data):
     
     game_code = generate_game_code()
     quiz = quizzes[quiz_id]
+    
+    # Create in database
+    db.create_game(game_code, sid, quiz["title"], quiz)
     
     games[game_code] = {
         "host_sid": sid,
@@ -166,6 +301,11 @@ async def join_game(sid, data):
             await sio.emit("error", {"message": "Name bereits vergeben"}, to=sid)
             return
     
+    # Add to database
+    if not db.add_player(game_code, sid, player_name):
+        await sio.emit("error", {"message": "Fehler beim Beitreten"}, to=sid)
+        return
+    
     game["players"][sid] = {
         "name": player_name,
         "score": 0,
@@ -210,6 +350,7 @@ async def start_game(sid, data):
     await sio.emit("game_starting", {}, room=game_code)
     
     # Short countdown before first question
+    sync_game_to_db(game_code)
     await asyncio.sleep(3)
     await next_question(game_code)
 
@@ -231,6 +372,9 @@ async def next_question(game_code: str):
     question = game["quiz"]["questions"][game["current_question"]]
     game["state"] = "question"
     game["question_start_time"] = asyncio.get_event_loop().time()
+    
+    # Sync to database
+    sync_game_to_db(game_code)
     
     # Send question to host (with correct answer)
     await sio.emit("show_question", {
@@ -282,6 +426,19 @@ async def submit_answer(sid, data):
         "answer": answer_index,
         "time": response_time,
     }
+    
+    # Record answer in database
+    player = game["players"][sid]
+    is_correct = answer_index == question["correct"]
+    db.record_answer(
+        game_code,
+        player["name"],
+        game["current_question"],
+        answer_index,
+        is_correct,
+        int(response_time * 1000),  # Convert to milliseconds
+        0  # Points will be updated in show_results
+    )
     
     await sio.emit("answer_received", {}, to=sid)
     
@@ -346,6 +503,9 @@ async def show_results(game_code: str):
             if player["streak"] > 1:
                 score += min(player["streak"] * 50, 200)
             player["score"] += score
+            
+            # Update database
+            db.update_player_score(game_code, player["name"], player["score"])
             
             results.append({
                 "sid": player_sid,
@@ -427,6 +587,9 @@ async def configure_teams(sid, data):
     game["teams"] = teams
     game["top_n_players"] = top_n_players
     
+    # Update database
+    db.update_game(game_code, team_mode=team_mode, teams=teams, top_n_players=top_n_players)
+    
     # Notify all players about team mode update
     await sio.emit("team_config_updated", {
         "team_mode": team_mode,
@@ -459,6 +622,9 @@ async def select_team(sid, data):
         return
     
     game["players"][sid]["team"] = team
+    
+    # Update database
+    db.update_player_team(game_code, game["players"][sid]["name"], team)
     
     # Notify host and all players
     player_list = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
@@ -530,6 +696,18 @@ async def end_game(game_code: str):
         "team_leaderboard": team_leaderboard,
         "top_n_players": game["top_n_players"]
     }, room=game_code)
+    
+    # Update final state in database
+    db.update_game(game_code, state="ended")
+
+
+# Startup cleanup
+@app.on_event("startup")
+async def startup_cleanup():
+    """Clean up old games on startup."""
+    deleted = db.cleanup_old_games(24)
+    if deleted > 0:
+        print(f"Cleaned up {deleted} old games")
 
 
 if __name__ == "__main__":

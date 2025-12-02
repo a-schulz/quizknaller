@@ -99,6 +99,8 @@ document.querySelectorAll('.answer-btn').forEach(btn => {
 
 elements.playAgainBtn.addEventListener('click', () => {
     gameCode = null;
+    localStorage.removeItem('playerGameCode');
+    localStorage.removeItem('playerName');
     elements.gameCodeInput.value = '';
     showScreen('join');
 });
@@ -108,8 +110,50 @@ socket.on('error', (data) => {
     showError(data.message);
 });
 
+// Try to reconnect on page load
+window.addEventListener('load', () => {
+    const savedGameCode = localStorage.getItem('playerGameCode');
+    const savedPlayerName = localStorage.getItem('playerName');
+    if (savedGameCode && savedPlayerName) {
+        socket.emit('reconnect_player', { code: savedGameCode, name: savedPlayerName });
+    }
+});
+
+// Reconnection handlers
+socket.on('reconnected_player', (data) => {
+    gameCode = data.code;
+    elements.playerNameInput.value = localStorage.getItem('playerName');
+    elements.waitingQuizTitle.textContent = data.quiz_title;
+    
+    // Restore to appropriate screen based on state
+    if (data.state === 'lobby') {
+        if (data.team_mode && data.teams && data.teams.length > 0 && !data.team) {
+            showTeamSelection(data.teams);
+        } else {
+            showScreen('waiting');
+        }
+    } else if (data.state === 'starting') {
+        showScreen('starting');
+    } else if (data.state === 'question') {
+        showScreen('question');
+    } else if (data.state === 'results') {
+        showScreen('answered');
+    } else if (data.state === 'ended') {
+        showScreen('final');
+    }
+});
+
+socket.on('reconnect_failed', (data) => {
+    localStorage.removeItem('playerGameCode');
+    localStorage.removeItem('playerName');
+    showError(data.message || 'Verbindung fehlgeschlagen');
+    showScreen('join');
+});
+
 socket.on('joined_game', (data) => {
     gameCode = data.code;
+    localStorage.setItem('playerGameCode', data.code);
+    localStorage.setItem('playerName', elements.playerNameInput.value.trim());
     elements.waitingQuizTitle.textContent = data.quiz_title;
     
     // If team mode is enabled, show team selection
@@ -236,6 +280,8 @@ socket.on('your_result', (data) => {
 
 socket.on('game_ended', (data) => {
     if (timerInterval) clearInterval(timerInterval);
+    localStorage.removeItem('playerGameCode');
+    localStorage.removeItem('playerName');
     
     if (data.reason) {
         showError(data.reason);

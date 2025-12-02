@@ -6,6 +6,8 @@ let correctIndex = null;
 let timeLimit = 20;
 let timerInterval = null;
 let totalPlayers = 0;
+let autoplayEnabled = false;
+let autoplayTimeout = null;
 
 // DOM Elements
 const screens = {
@@ -26,6 +28,7 @@ const elements = {
     playerCount: document.getElementById('player-count'),
     playersGrid: document.getElementById('players-grid'),
     startGameBtn: document.getElementById('start-game-btn'),
+    autoplayCheckbox: document.getElementById('autoplay-checkbox'),
     teamModeCheckbox: document.getElementById('team-mode-checkbox'),
     teamSettings: document.getElementById('team-settings'),
     teamsInput: document.getElementById('teams-input'),
@@ -77,9 +80,107 @@ async function loadQuizzes() {
 // Initialize
 loadQuizzes();
 
+// Try to reconnect on page load
+window.addEventListener('load', () => {
+    const savedGameCode = localStorage.getItem('hostGameCode');
+    if (savedGameCode) {
+        socket.emit('reconnect_host', { code: savedGameCode });
+    }
+});
+
+// Reconnection handlers
+socket.on('reconnected_host', (data) => {
+    gameCode = data.code;
+    elements.lobbyQuizTitle.textContent = data.quiz_title;
+    elements.joinUrl.textContent = window.location.host;
+    elements.gameCodeDisplay.textContent = data.code;
+    elements.qrCode.src = `/api/qrcode?code=${data.code}`;
+    
+    // Restore players
+    elements.playersGrid.innerHTML = '';
+    const teamMode = data.players.some(p => p.team !== null && p.team !== undefined);
+    
+    if (teamMode) {
+        const teams = {};
+        const noTeam = [];
+        
+        data.players.forEach(player => {
+            if (player.team) {
+                if (!teams[player.team]) teams[player.team] = [];
+                teams[player.team].push(player);
+            } else {
+                noTeam.push(player);
+            }
+        });
+        
+        Object.keys(teams).forEach(teamName => {
+            const teamHeader = document.createElement('div');
+            teamHeader.className = 'team-header';
+            teamHeader.textContent = teamName;
+            elements.playersGrid.appendChild(teamHeader);
+            
+            teams[teamName].forEach(player => {
+                const chip = document.createElement('div');
+                chip.className = 'player-chip';
+                chip.textContent = player.name;
+                elements.playersGrid.appendChild(chip);
+            });
+        });
+        
+        if (noTeam.length > 0) {
+            const teamHeader = document.createElement('div');
+            teamHeader.className = 'team-header no-team';
+            teamHeader.textContent = 'Kein Team';
+            elements.playersGrid.appendChild(teamHeader);
+            
+            noTeam.forEach(player => {
+                const chip = document.createElement('div');
+                chip.className = 'player-chip no-team';
+                chip.textContent = player.name;
+                elements.playersGrid.appendChild(chip);
+            });
+        }
+    } else {
+        data.players.forEach(player => {
+            const chip = document.createElement('div');
+            chip.className = 'player-chip';
+            chip.textContent = player.name;
+            elements.playersGrid.appendChild(chip);
+        });
+    }
+    
+    totalPlayers = data.players.length;
+    elements.playerCount.textContent = totalPlayers;
+    elements.startGameBtn.disabled = totalPlayers < 1;
+    
+    // Restore to appropriate screen based on state
+    if (data.state === 'lobby') {
+        showScreen('lobby');
+    } else if (data.state === 'starting') {
+        showScreen('countdown');
+    } else if (data.state === 'question') {
+        // Host will receive show_question event from backend
+        showScreen('lobby'); // Temporary, will switch when question arrives
+    } else if (data.state === 'results') {
+        showScreen('lobby'); // Temporary
+    } else if (data.state === 'ended') {
+        showScreen('final');
+    }
+});
+
+socket.on('reconnect_failed', (data) => {
+    localStorage.removeItem('hostGameCode');
+    alert(data.message || 'Verbindung fehlgeschlagen');
+    showScreen('select');
+});
+
 // Event Listeners
 elements.startGameBtn.addEventListener('click', () => {
     socket.emit('start_game', { code: gameCode });
+});
+
+elements.autoplayCheckbox.addEventListener('change', (e) => {
+    autoplayEnabled = e.target.checked;
 });
 
 elements.teamModeCheckbox.addEventListener('change', (e) => {
@@ -124,11 +225,16 @@ elements.saveTeamsBtn.addEventListener('click', () => {
 });
 
 elements.nextQuestionBtn.addEventListener('click', () => {
+    if (autoplayTimeout) {
+        clearTimeout(autoplayTimeout);
+        autoplayTimeout = null;
+    }
     socket.emit('next_question_request', { code: gameCode });
 });
 
 elements.newGameBtn.addEventListener('click', () => {
     gameCode = null;
+    localStorage.removeItem('hostGameCode');
     loadQuizzes();
     showScreen('select');
 });
@@ -136,6 +242,7 @@ elements.newGameBtn.addEventListener('click', () => {
 // Socket Events
 socket.on('game_created', (data) => {
     gameCode = data.code;
+    localStorage.setItem('hostGameCode', data.code);
     elements.lobbyQuizTitle.textContent = data.quiz_title;
     elements.joinUrl.textContent = window.location.host;
     elements.gameCodeDisplay.textContent = data.code;
@@ -387,11 +494,19 @@ socket.on('show_results', (data) => {
         });
         
         showScreen('results');
+        
+        // Auto-advance to next question if autoplay is enabled
+        if (autoplayEnabled) {
+            autoplayTimeout = setTimeout(() => {
+                elements.nextQuestionBtn.click();
+            }, 5000); // Wait 5 seconds before advancing
+        }
     }, 1500);
 });
 
 socket.on('game_ended', (data) => {
     if (timerInterval) clearInterval(timerInterval);
+    localStorage.removeItem('hostGameCode');
     
     if (data.reason) {
         alert(data.reason);
