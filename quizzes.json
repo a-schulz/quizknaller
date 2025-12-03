@@ -1208,12 +1208,23 @@
     "title": "Weihnachtsfeier 🎅🌍",
     "questions": [
       {
-        "question": "In welchem Land ist KFC ein typisches Weihnachtsessen?",
+        "question": "In welchem Land fährt man mit Rollschuhen zur Weihnachtsmesse?",
         "answers": [
-          "China",
-          "Japan",
-          "Südkorea",
-          "Thailand"
+          "Mexiko",
+          "Venezuela",
+          "Kolumbien",
+          "Brasilien"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Land versteckt man an Weihnachten traditionell alle Besen?",
+        "answers": [
+          "Finnland",
+          "Norwegen",
+          "Island",
+          "Schweden"
         ],
         "correct": 1,
         "time_limit": 15
@@ -1230,15 +1241,15 @@
         "time_limit": 15
       },
       {
-        "question": "In welchem Land steht der größte natürliche Weihnachtsbaum der Welt?",
+        "question": "In welchem Land ist KFC ein typisches Weihnachtsessen?",
         "answers": [
-          "Deutschland",
-          "Schweden",
-          "USA",
-          "Kanada"
+          "China",
+          "Japan",
+          "Südkorea",
+          "Thailand"
         ],
-        "correct": 2,
-        "time_limit": 20
+        "correct": 1,
+        "time_limit": 15
       },
       {
         "question": "In welchem Land bringt die Hexe 'La Befana' am 6. Januar die Geschenke?",
@@ -1250,17 +1261,6 @@
         ],
         "correct": 1,
         "time_limit": 12
-      },
-      {
-        "question": "In welchem Land spielt der Film 'Drei Haselnüsse für Aschenbrödel'?",
-        "answers": [
-          "Deutschland",
-          "Österreich",
-          "Tschechien",
-          "Polen"
-        ],
-        "correct": 2,
-        "time_limit": 20
       },
       {
         "question": "In welchem Land wird Weihnachten am Strand gefeiert?",
@@ -1329,17 +1329,6 @@
         "time_limit": 20
       },
       {
-        "question": "Welcher Wochentag ist der Heiligabend 2025?",
-        "answers": [
-          "Montag",
-          "Dienstag",
-          "Mittwoch",
-          "Donnerstag"
-        ],
-        "correct": 2,
-        "time_limit": 20
-      },
-      {
         "question": "Was symbolisiert die Mistel an Weihnachten?",
         "answers": [
           "Frieden und Liebe",
@@ -1395,17 +1384,6 @@
         "time_limit": 15
       },
       {
-        "question": "Welches Land exportiert weltweit die meisten echten Weihnachtsbäume?",
-        "answers": [
-          "Deutschland",
-          "Kanada",
-          "Dänemark",
-          "USA"
-        ],
-        "correct": 2,
-        "time_limit": 15
-      },
-      {
         "question": "Wer singt 'Last Christmas'?",
         "answers": [
           "Michael Jackson",
@@ -1437,50 +1415,6 @@
         ],
         "correct": 1,
         "time_limit": 10
-      },
-      {
-        "question": "Wie viele Kalorien hat ein klassisches Weihnachtsmenü ungefähr?",
-        "answers": [
-          "1.500 kcal",
-          "3.000 kcal",
-          "5.000 kcal",
-          "7.000 kcal"
-        ],
-        "correct": 2,
-        "time_limit": 15
-      },
-      {
-        "question": "In welchem Land versteckt man an Weihnachten traditionell alle Besen?",
-        "answers": [
-          "Finnland",
-          "Norwegen",
-          "Island",
-          "Schweden"
-        ],
-        "correct": 1,
-        "time_limit": 15
-      },
-      {
-        "question": "Welches ist der meistverkaufte Weihnachtssong aller Zeiten?",
-        "answers": [
-          "Last Christmas",
-          "All I Want for Christmas",
-          "White Christmas",
-          "Jingle Bells"
-        ],
-        "correct": 2,
-        "time_limit": 12
-      },
-      {
-        "question": "In welchem Land fährt man mit Rollschuhen zur Weihnachtsmesse?",
-        "answers": [
-          "Mexiko",
-          "Venezuela",
-          "Kolumbien",
-          "Brasilien"
-        ],
-        "correct": 1,
-        "time_limit": 15
       },
       {
         "question": "Welcher deutsche Weihnachtsmarkt ist der älteste (seit 1434)?",
