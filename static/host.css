@@ -32,6 +32,35 @@ html, body {
     overflow: hidden;
 }
 
+/* Header Game Code Badge */
+.header-game-code {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gradient-1);
+    padding: 8px 16px;
+    border-radius: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.header-code-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.header-code-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* Header right section for question screen */
+.header-right-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
 .screen {
     position: fixed;
     top: 0;
@@ -793,17 +822,20 @@ html, body {
 }
 
 .results-header {
-    padding: 30px 50px;
+    padding: 20px 50px;
     background: rgba(0,0,0,0.3);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    gap: 30px;
+    gap: 20px;
 }
 
-.results-header h2 {
-    font-size: 2.5rem;
-    margin: 0;
+.results-header .btn-end-game {
+    margin-right: auto;
+}
+
+.results-header .btn-next {
+    margin-left: 0;
 }
 
 .results-main {

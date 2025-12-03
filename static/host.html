@@ -139,9 +139,15 @@
                     <span class="timer-text" id="timer-text">20</span>
                 </div>
             </div>
-            <div class="answer-count">
-                <span id="answered-count">0</span> / <span id="total-players">0</span>
-                <small>Antworten</small>
+            <div class="header-right-section">
+                <div class="header-game-code" id="question-game-code">
+                    <span class="header-code-label">Code:</span>
+                    <span class="header-code-value"></span>
+                </div>
+                <div class="answer-count">
+                    <span id="answered-count">0</span> / <span id="total-players">0</span>
+                    <small>Antworten</small>
+                </div>
             </div>
         </div>
         <div class="question-main">
@@ -170,9 +176,13 @@
     <!-- Results Screen -->
     <div id="results-screen" class="screen">
         <div class="results-header">
-            <h2>Auflösung</h2>
+            <div class="header-game-code" id="results-game-code">
+                <span class="header-code-label">Code:</span>
+                <span class="header-code-value"></span>
+            </div>
+            <button id="end-game-btn-results" class="btn-end-game" title="Spiel beenden">❌ Beenden</button>
             <div id="autoplay-countdown" class="autoplay-countdown" style="display: none;">
-                Nächste Frage in <span id="autoplay-timer">5</span>s
+                Nächste Frage in <span id="autoplay-timer">10</span>s
             </div>
             <button id="next-question-btn" class="btn-next">Weiter ➜</button>
         </div>

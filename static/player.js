@@ -1,6 +1,9 @@
 // QuizKnaller - Player Client
 const socket = io();
 
+// Configuration
+const AUTOPLAY_COUNTDOWN_SECONDS = 10;
+
 let gameCode = null;
 let timeLimit = 20;
 let timerInterval = null;
@@ -104,7 +107,9 @@ elements.playAgainBtn.addEventListener('click', () => {
     gameCode = null;
     localStorage.removeItem('playerGameCode');
     localStorage.removeItem('playerName');
+    localStorage.removeItem('playerQuizTitle');
     elements.gameCodeInput.value = '';
+    elements.playerNameInput.value = '';
     showScreen('join');
 });
 
@@ -121,6 +126,11 @@ window.addEventListener('load', () => {
     
     if (codeFromUrl) {
         elements.gameCodeInput.value = codeFromUrl.toUpperCase();
+        // Pre-fill name if we have it saved
+        const savedName = localStorage.getItem('playerName');
+        if (savedName) {
+            elements.playerNameInput.value = savedName;
+        }
         // Focus on name input since code is already filled
         elements.playerNameInput.focus();
         // Clear the URL parameter without reloading the page
@@ -133,6 +143,9 @@ window.addEventListener('load', () => {
     const savedGameCode = localStorage.getItem('playerGameCode');
     const savedPlayerName = localStorage.getItem('playerName');
     if (savedGameCode && savedPlayerName) {
+        // Pre-fill the inputs for visual feedback
+        elements.gameCodeInput.value = savedGameCode;
+        elements.playerNameInput.value = savedPlayerName;
         socket.emit('reconnect_player', { code: savedGameCode, name: savedPlayerName });
     }
 });
@@ -164,14 +177,18 @@ socket.on('reconnected_player', (data) => {
 socket.on('reconnect_failed', (data) => {
     localStorage.removeItem('playerGameCode');
     localStorage.removeItem('playerName');
+    localStorage.removeItem('playerQuizTitle');
     showError(data.message || 'Verbindung fehlgeschlagen');
     showScreen('join');
 });
 
 socket.on('joined_game', (data) => {
     gameCode = data.code;
+    // Save to localStorage for reconnection
     localStorage.setItem('playerGameCode', data.code);
     localStorage.setItem('playerName', elements.playerNameInput.value.trim());
+    localStorage.setItem('playerQuizTitle', data.quiz_title);
+    
     elements.waitingQuizTitle.textContent = data.quiz_title;
     
     // If team mode is enabled, show team selection
@@ -305,7 +322,7 @@ socket.on('your_result', (data) => {
 // Handle autoplay countdown from host
 socket.on('autoplay_countdown', (data) => {
     if (elements.playerAutoplayCountdown && elements.playerAutoplayTimer) {
-        let countdown = data.seconds || 5;
+        let countdown = data.seconds || AUTOPLAY_COUNTDOWN_SECONDS;
         elements.playerAutoplayTimer.textContent = countdown;
         elements.playerAutoplayCountdown.style.display = 'block';
         
@@ -334,6 +351,7 @@ socket.on('game_ended', (data) => {
     gameCode = null;
     localStorage.removeItem('playerGameCode');
     localStorage.removeItem('playerName');
+    localStorage.removeItem('playerQuizTitle');
     
     if (data.reason || data.message) {
         // Show a more prominent notification for game ended by host

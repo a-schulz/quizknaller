@@ -1,6 +1,9 @@
 // QuizKnaller - Host Client
 const socket = io();
 
+// Configuration
+const AUTOPLAY_COUNTDOWN_SECONDS = 10;
+
 let gameCode = null;
 let correctIndex = null;
 let timeLimit = 20;
@@ -48,6 +51,10 @@ const elements = {
     teamConfigOffcanvas: document.getElementById('team-config-offcanvas'),
     teamConfigClose: document.getElementById('team-config-close'),
     offcanvasBackdrop: document.getElementById('offcanvas-backdrop'),
+    // Header game code elements
+    questionGameCode: document.getElementById('question-game-code'),
+    resultsGameCode: document.getElementById('results-game-code'),
+    endGameBtnResults: document.getElementById('end-game-btn-results'),
     countdownNumber: document.getElementById('countdown-number'),
     questionNumber: document.getElementById('question-number'),
     timerProgress: document.getElementById('timer-progress'),
@@ -71,6 +78,14 @@ const elements = {
 function showScreen(screenName) {
     Object.values(screens).forEach(s => s.classList.remove('active'));
     screens[screenName].classList.add('active');
+}
+
+// Update game code displays in headers
+function updateHeaderGameCodes(code) {
+    const codeValue = code || '';
+    document.querySelectorAll('.header-code-value').forEach(el => {
+        el.textContent = codeValue;
+    });
 }
 
 // Load quizzes
@@ -107,67 +122,21 @@ window.addEventListener('load', () => {
 // Reconnection handlers
 socket.on('reconnected_host', (data) => {
     gameCode = data.code;
+    
+    // Update localStorage
+    localStorage.setItem('hostGameCode', data.code);
+    localStorage.setItem('hostQuizTitle', data.quiz_title);
+    
+    // Update header game codes
+    updateHeaderGameCodes(data.code);
+    
     elements.lobbyQuizTitle.textContent = data.quiz_title;
     elements.joinUrl.textContent = window.location.host;
     elements.gameCodeDisplay.textContent = data.code;
     elements.qrCode.src = `/api/qrcode?code=${data.code}`;
     
-    // Restore players
-    elements.playersGrid.innerHTML = '';
-    const teamMode = data.players.some(p => p.team !== null && p.team !== undefined);
-    
-    if (teamMode) {
-        const teams = {};
-        const noTeam = [];
-        
-        data.players.forEach(player => {
-            if (player.team) {
-                if (!teams[player.team]) teams[player.team] = [];
-                teams[player.team].push(player);
-            } else {
-                noTeam.push(player);
-            }
-        });
-        
-        Object.keys(teams).forEach(teamName => {
-            const teamHeader = document.createElement('div');
-            teamHeader.className = 'team-header';
-            teamHeader.textContent = teamName;
-            elements.playersGrid.appendChild(teamHeader);
-            
-            teams[teamName].forEach(player => {
-                const chip = document.createElement('div');
-                chip.className = 'player-chip';
-                chip.textContent = player.name;
-                elements.playersGrid.appendChild(chip);
-            });
-        });
-        
-        if (noTeam.length > 0) {
-            const teamHeader = document.createElement('div');
-            teamHeader.className = 'team-header no-team';
-            teamHeader.textContent = 'Kein Team';
-            elements.playersGrid.appendChild(teamHeader);
-            
-            noTeam.forEach(player => {
-                const chip = document.createElement('div');
-                chip.className = 'player-chip no-team';
-                chip.textContent = player.name;
-                elements.playersGrid.appendChild(chip);
-            });
-        }
-    } else {
-        data.players.forEach(player => {
-            const chip = document.createElement('div');
-            chip.className = 'player-chip';
-            chip.textContent = player.name;
-            elements.playersGrid.appendChild(chip);
-        });
-    }
-    
-    totalPlayers = data.players.length;
-    elements.playerCount.textContent = totalPlayers;
-    elements.startGameBtn.disabled = totalPlayers < 1;
+    // Restore players using helper function
+    updatePlayerDisplay(data.players);
     
     // Restore to appropriate screen based on state
     if (data.state === 'lobby') {
@@ -186,6 +155,8 @@ socket.on('reconnected_host', (data) => {
 
 socket.on('reconnect_failed', (data) => {
     localStorage.removeItem('hostGameCode');
+    localStorage.removeItem('hostQuizTitle');
+    updateHeaderGameCodes(null);
     alert(data.message || 'Verbindung fehlgeschlagen');
     showScreen('select');
 });
@@ -211,6 +182,20 @@ elements.endGameBtn.addEventListener('click', () => {
         socket.emit('end_game_request', { code: gameCode });
         gameCode = null;
         localStorage.removeItem('hostGameCode');
+        localStorage.removeItem('hostQuizTitle');
+        updateHeaderGameCodes(null);
+        showScreen('select');
+    }
+});
+
+// End game button on results screen
+elements.endGameBtnResults.addEventListener('click', () => {
+    if (confirm('Möchtest du das Spiel wirklich beenden?')) {
+        socket.emit('end_game_request', { code: gameCode });
+        gameCode = null;
+        localStorage.removeItem('hostGameCode');
+        localStorage.removeItem('hostQuizTitle');
+        updateHeaderGameCodes(null);
         showScreen('select');
     }
 });
@@ -329,6 +314,8 @@ elements.nextQuestionBtn.addEventListener('click', () => {
 elements.newGameBtn.addEventListener('click', () => {
     gameCode = null;
     localStorage.removeItem('hostGameCode');
+    localStorage.removeItem('hostQuizTitle');
+    updateHeaderGameCodes(null);
     loadQuizzes();
     showScreen('select');
 });
@@ -336,7 +323,10 @@ elements.newGameBtn.addEventListener('click', () => {
 // Socket Events
 socket.on('game_created', (data) => {
     gameCode = data.code;
+    // Save to localStorage for reconnection
     localStorage.setItem('hostGameCode', data.code);
+    localStorage.setItem('hostQuizTitle', data.quiz_title);
+    
     elements.lobbyQuizTitle.textContent = data.quiz_title;
     elements.joinUrl.textContent = window.location.host;
     elements.gameCodeDisplay.textContent = data.code;
@@ -344,21 +334,26 @@ socket.on('game_created', (data) => {
     elements.playersGrid.innerHTML = '';
     elements.playerCount.textContent = '0';
     elements.startGameBtn.disabled = true;
+    
+    // Update header game codes
+    updateHeaderGameCodes(data.code);
+    
     showScreen('lobby');
 });
 
-socket.on('player_joined', (data) => {
+// Helper function to update player display
+function updatePlayerDisplay(players) {
     elements.playersGrid.innerHTML = '';
     
     // Group players by team if team mode is active
-    const teamMode = data.players.some(p => p.team !== null && p.team !== undefined);
+    const teamMode = players.some(p => p.team !== null && p.team !== undefined);
     
     if (teamMode) {
         // Group players by team
         const teams = {};
         const noTeam = [];
         
-        data.players.forEach(player => {
+        players.forEach(player => {
             if (player.team) {
                 if (!teams[player.team]) teams[player.team] = [];
                 teams[player.team].push(player);
@@ -398,7 +393,7 @@ socket.on('player_joined', (data) => {
         }
     } else {
         // Normal display
-        data.players.forEach(player => {
+        players.forEach(player => {
             const chip = document.createElement('div');
             chip.className = 'player-chip';
             chip.textContent = player.name;
@@ -406,74 +401,21 @@ socket.on('player_joined', (data) => {
         });
     }
     
-    totalPlayers = data.players.length;
+    totalPlayers = players.length;
     elements.playerCount.textContent = totalPlayers;
     elements.startGameBtn.disabled = totalPlayers < 1;
-});
+}
 
-socket.on('player_updated', (data) => {
-    // Reuse the player_joined logic
-    socket.emit('__dummy__');
-    const event = { players: data.players };
-    document.dispatchEvent(new CustomEvent('player_joined', { detail: event }));
-    
-    // Update display manually
-    elements.playersGrid.innerHTML = '';
-    
-    const teamMode = data.players.some(p => p.team !== null && p.team !== undefined);
-    
-    if (teamMode) {
-        const teams = {};
-        const noTeam = [];
-        
-        data.players.forEach(player => {
-            if (player.team) {
-                if (!teams[player.team]) teams[player.team] = [];
-                teams[player.team].push(player);
-            } else {
-                noTeam.push(player);
-            }
-        });
-        
-        Object.keys(teams).forEach(teamName => {
-            const teamHeader = document.createElement('div');
-            teamHeader.className = 'team-header';
-            teamHeader.textContent = teamName;
-            elements.playersGrid.appendChild(teamHeader);
-            
-            teams[teamName].forEach(player => {
-                const chip = document.createElement('div');
-                chip.className = 'player-chip';
-                chip.textContent = player.name;
-                elements.playersGrid.appendChild(chip);
-            });
-        });
-        
-        if (noTeam.length > 0) {
-            const teamHeader = document.createElement('div');
-            teamHeader.className = 'team-header no-team';
-            teamHeader.textContent = 'Kein Team';
-            elements.playersGrid.appendChild(teamHeader);
-            
-            noTeam.forEach(player => {
-                const chip = document.createElement('div');
-                chip.className = 'player-chip no-team';
-                chip.textContent = player.name;
-                elements.playersGrid.appendChild(chip);
-            });
-        }
-    } else {
-        data.players.forEach(player => {
-            const chip = document.createElement('div');
-            chip.className = 'player-chip';
-            chip.textContent = player.name;
-            elements.playersGrid.appendChild(chip);
-        });
-    }
+socket.on('player_joined', (data) => {
+    updatePlayerDisplay(data.players);
 });
 
 socket.on('player_left', (data) => {
-    // Will be handled by next player_joined event
+    updatePlayerDisplay(data.players);
+});
+
+socket.on('player_updated', (data) => {
+    updatePlayerDisplay(data.players);
 });
 
 socket.on('game_starting', () => {
@@ -591,7 +533,7 @@ socket.on('show_results', (data) => {
         
         // Auto-advance to next question if autoplay is enabled
         if (autoplayEnabled) {
-            let countdown = 10;
+            let countdown = AUTOPLAY_COUNTDOWN_SECONDS;
             elements.autoplayTimer.textContent = countdown;
             elements.autoplayCountdown.style.display = 'block';
             
@@ -611,7 +553,7 @@ socket.on('show_results', (data) => {
             autoplayTimeout = setTimeout(() => {
                 elements.autoplayCountdown.style.display = 'none';
                 elements.nextQuestionBtn.click();
-            }, 5000); // Wait 5 seconds before advancing
+            }, AUTOPLAY_COUNTDOWN_SECONDS * 1000);
         }
     }, 1500);
 });

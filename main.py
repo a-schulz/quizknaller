@@ -243,8 +243,29 @@ async def disconnect(sid):
     print(f"Client disconnected: {sid}")
     # Mark player as disconnected in database
     db.set_player_connected(sid, False)
-    # Don't remove player immediately - allow reconnection
-    # Players will be removed after game ends or timeout
+    
+    # Find which game this player was in and notify the host
+    for game_code, game in list(games.items()):
+        if sid in game["players"]:
+            player_name = game["players"][sid]["name"]
+            # Remove player from game
+            del game["players"][sid]
+            
+            # Notify host and remaining players about the disconnection
+            player_list = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+            await sio.emit("player_left", {
+                "name": player_name,
+                "players": player_list
+            }, room=game_code)
+            break
+        elif sid == game["host_sid"]:
+            # Host disconnected - end the game for all players
+            await sio.emit("game_ended", {"message": "Der Host hat das Spiel verlassen."}, room=game_code)
+            # Give some time for the message to be delivered
+            await asyncio.sleep(0.5)
+            if game_code in games:
+                del games[game_code]
+            break
 
 
 @sio.event
@@ -466,7 +487,7 @@ async def submit_answer(sid, data):
 async def autoplay_started(sid, data):
     """Host signals autoplay countdown has started - forward to players."""
     game_code = data.get("code")
-    seconds = data.get("seconds", 5)
+    seconds = data.get("seconds", 10)  # Default matches AUTOPLAY_COUNTDOWN_SECONDS in JS
     
     if game_code not in games:
         return
@@ -692,6 +713,9 @@ async def end_game_request(sid, data):
     
     # Notify all players that the game has ended
     await sio.emit("game_ended", {"message": "Das Spiel wurde vom Host beendet."}, room=game_code)
+    
+    # Give some time for the message to be delivered
+    await asyncio.sleep(0.5)
     
     # Clean up the game
     if game_code in games:
