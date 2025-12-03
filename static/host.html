@@ -128,6 +128,10 @@
     <div id="results-screen" class="screen">
         <div class="results-header">
             <h2>Auflösung</h2>
+            <div id="autoplay-countdown" class="autoplay-countdown" style="display: none;">
+                Nächste Frage in <span id="autoplay-timer">5</span>s
+            </div>
+            <button id="next-question-btn" class="btn-next">Weiter ➜</button>
         </div>
         <div class="results-main">
             <div class="correct-answer-display">
@@ -157,9 +161,6 @@
                 </div>
             </div>
             <div class="leaderboard-preview" id="leaderboard-preview"></div>
-        </div>
-        <div class="results-footer">
-            <button id="next-question-btn" class="btn-next">Weiter ➜</button>
         </div>
     </div>
 

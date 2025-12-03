@@ -559,11 +559,15 @@ html, body {
 .results-header {
     padding: 30px 50px;
     background: rgba(0,0,0,0.3);
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
 }
 
 .results-header h2 {
     font-size: 2.5rem;
+    margin: 0;
 }
 
 .results-main {
@@ -687,28 +691,56 @@ html, body {
     font-weight: 500;
 }
 
-.results-footer {
-    padding: 30px 50px;
+.autoplay-countdown {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--accent-orange);
+    background: rgba(253, 203, 110, 0.15);
+    padding: 10px 25px;
+    border-radius: 25px;
+    border: 2px solid var(--accent-orange);
+    animation: pulse 1s ease-in-out infinite;
+    white-space: nowrap;
+}
+
+.autoplay-countdown #autoplay-timer {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    display: inline-block;
+    min-width: 25px;
     text-align: center;
-    background: rgba(0,0,0,0.3);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
 }
 
 .btn-next {
-    padding: 20px 60px;
-    font-size: 1.8rem;
+    padding: 12px 35px;
+    font-size: 1.4rem;
     font-family: inherit;
     font-weight: 600;
     border: none;
-    border-radius: 20px;
+    border-radius: 15px;
     background: var(--primary);
     color: white;
     cursor: pointer;
-    transition: transform 0.2s;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    white-space: nowrap;
 }
 
 .btn-next:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
+    background: var(--primary-dark);
 }
 
 /* Final Screen */

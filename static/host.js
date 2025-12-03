@@ -8,6 +8,7 @@ let timerInterval = null;
 let totalPlayers = 0;
 let autoplayEnabled = false;
 let autoplayTimeout = null;
+let autoplayCountdownInterval = null;
 
 // DOM Elements
 const screens = {
@@ -45,6 +46,8 @@ const elements = {
     correctAnswerBox: document.getElementById('correct-answer-box'),
     leaderboardPreview: document.getElementById('leaderboard-preview'),
     nextQuestionBtn: document.getElementById('next-question-btn'),
+    autoplayCountdown: document.getElementById('autoplay-countdown'),
+    autoplayTimer: document.getElementById('autoplay-timer'),
     podium: document.getElementById('podium'),
     fullLeaderboard: document.getElementById('full-leaderboard'),
     newGameBtn: document.getElementById('new-game-btn'),
@@ -228,6 +231,13 @@ elements.nextQuestionBtn.addEventListener('click', () => {
     if (autoplayTimeout) {
         clearTimeout(autoplayTimeout);
         autoplayTimeout = null;
+    }
+    if (autoplayCountdownInterval) {
+        clearInterval(autoplayCountdownInterval);
+        autoplayCountdownInterval = null;
+    }
+    if (elements.autoplayCountdown) {
+        elements.autoplayCountdown.style.display = 'none';
     }
     socket.emit('next_question_request', { code: gameCode });
 });
@@ -497,7 +507,22 @@ socket.on('show_results', (data) => {
         
         // Auto-advance to next question if autoplay is enabled
         if (autoplayEnabled) {
+            let countdown = 5;
+            elements.autoplayTimer.textContent = countdown;
+            elements.autoplayCountdown.style.display = 'block';
+            
+            autoplayCountdownInterval = setInterval(() => {
+                countdown--;
+                elements.autoplayTimer.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(autoplayCountdownInterval);
+                    autoplayCountdownInterval = null;
+                }
+            }, 1000);
+            
             autoplayTimeout = setTimeout(() => {
+                elements.autoplayCountdown.style.display = 'none';
                 elements.nextQuestionBtn.click();
             }, 5000); // Wait 5 seconds before advancing
         }
