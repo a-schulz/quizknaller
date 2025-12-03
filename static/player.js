@@ -120,6 +120,12 @@ elements.playAgainBtn.addEventListener('click', () => {
 // Socket Events
 socket.on('error', (data) => {
     showError(data.message);
+    
+    // If game not found, clear localStorage so we don't keep trying to reconnect
+    if (data.message && (data.message.includes('nicht gefunden') || data.message.includes('not found'))) {
+        localStorage.removeItem('playerGameCode');
+        localStorage.removeItem('playerQuizTitle');
+    }
 });
 
 // Handle host disconnection

@@ -88,9 +88,12 @@ def init_db():
 
 
 def get_connection():
-    """Get a database connection with row factory."""
-    conn = sqlite3.connect(DB_PATH)
+    """Get a database connection with row factory and better concurrency settings."""
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
+    # Enable WAL mode for better concurrent access
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=30000")
     return conn
 
 
@@ -206,24 +209,62 @@ def delete_game(game_code: str) -> bool:
 # Player operations
 def add_player(game_code: str, session_id: str, name: str, team: Optional[str] = None) -> bool:
     """Add a player to the database."""
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-            INSERT INTO players (game_code, session_id, name, team)
-            VALUES (?, ?, ?, ?)
-        """, (game_code, session_id, name, team))
-        
-        conn.commit()
-        conn.close()
-        return True
-    except sqlite3.IntegrityError:
-        # Player name already exists in this game
-        return False
-    except Exception as e:
-        print(f"Error adding player: {e}")
-        return False
+    import time
+    max_retries = 5
+    retry_delay = 0.1
+    
+    for attempt in range(max_retries):
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            
+            # First check if player already exists (for reconnection)
+            cursor.execute("""
+                SELECT id FROM players WHERE game_code = ? AND LOWER(name) = LOWER(?)
+            """, (game_code, name))
+            existing = cursor.fetchone()
+            
+            if existing:
+                # Update existing player's session_id instead of inserting
+                cursor.execute("""
+                    UPDATE players SET session_id = ?, connected = 1, updated_at = CURRENT_TIMESTAMP
+                    WHERE game_code = ? AND LOWER(name) = LOWER(?)
+                """, (session_id, game_code, name))
+            else:
+                cursor.execute("""
+                    INSERT INTO players (game_code, session_id, name, team)
+                    VALUES (?, ?, ?, ?)
+                """, (game_code, session_id, name, team))
+            
+            conn.commit()
+            conn.close()
+            return True
+        except sqlite3.IntegrityError:
+            # Player name already exists - try update instead
+            try:
+                conn2 = get_connection()
+                cursor2 = conn2.cursor()
+                cursor2.execute("""
+                    UPDATE players SET session_id = ?, connected = 1, updated_at = CURRENT_TIMESTAMP
+                    WHERE game_code = ? AND LOWER(name) = LOWER(?)
+                """, (session_id, game_code, name))
+                conn2.commit()
+                conn2.close()
+                return True
+            except Exception:
+                pass
+            return False
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e) and attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+                continue
+            print(f"Error adding player: {e}")
+            return False
+        except Exception as e:
+            print(f"Error adding player: {e}")
+            return False
+    
+    return False
 
 
 def get_players(game_code: str) -> List[Dict[str, Any]]:

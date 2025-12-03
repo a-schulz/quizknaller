@@ -268,15 +268,29 @@ async def disconnect(sid):
     for game_code, game in list(games.items()):
         if sid in game["players"]:
             player_name = game["players"][sid]["name"]
-            # Remove player from game
-            del game["players"][sid]
             
-            # Notify host and remaining players about the disconnection
-            player_list = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
-            await sio.emit("player_left", {
-                "name": player_name,
-                "players": player_list
-            }, room=game_code)
+            # Only remove player if game is in lobby state
+            # During active game, keep player data for reconnection
+            if game["state"] == "lobby":
+                # Remove player from game in lobby
+                del game["players"][sid]
+                
+                # Notify host and remaining players about the disconnection
+                player_list = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+                await sio.emit("player_left", {
+                    "name": player_name,
+                    "players": player_list
+                }, room=game_code)
+            else:
+                # Game is active - mark player as disconnected but keep their data
+                game["players"][sid]["disconnected"] = True
+                print(f"Player {player_name} disconnected during active game {game_code}, keeping data for reconnection")
+                
+                # Notify host about temporary disconnection
+                await sio.emit("player_disconnected", {
+                    "name": player_name,
+                    "message": f"{player_name} hat die Verbindung verloren"
+                }, room=game_code)
             break
         elif sid == game["host_sid"]:
             # Host disconnected - start grace period for reconnection
@@ -374,15 +388,58 @@ async def join_game(sid, data):
     
     game = games[game_code]
     
+    # Check if player with same name already exists (potential reconnect)
+    existing_sid = None
+    for player_sid, player in game["players"].items():
+        if player["name"].lower() == player_name.lower():
+            existing_sid = player_sid
+            break
+    
+    if existing_sid is not None:
+        # Player with same name exists - treat as reconnection
+        # Transfer player data to new SID
+        player_data = game["players"][existing_sid]
+        del game["players"][existing_sid]
+        
+        # Clear disconnected flag if it was set
+        player_data["disconnected"] = False
+        
+        game["players"][sid] = player_data
+        
+        # Update database
+        db.update_player_session(game_code, player_name, sid)
+        
+        # Transfer answer if exists
+        if existing_sid in game["answers"]:
+            game["answers"][sid] = game["answers"][existing_sid]
+            del game["answers"][existing_sid]
+        
+        await sio.enter_room(sid, game_code)
+        
+        # Notify host that player reconnected
+        await sio.emit("player_reconnected", {
+            "name": player_name,
+            "message": f"{player_name} ist wieder verbunden"
+        }, room=game_code)
+        
+        # Send current game state (same as reconnect_player)
+        await sio.emit("reconnected_player", {
+            "code": game_code,
+            "quiz_title": game["quiz"]["title"],
+            "state": game["state"],
+            "score": player_data["score"],
+            "team": player_data["team"],
+            "team_mode": game["team_mode"],
+            "teams": game["teams"],
+        }, to=sid)
+        
+        print(f"Player {player_name} reconnected to game {game_code}")
+        return
+    
+    # New player - only allow in lobby state
     if game["state"] != "lobby":
         await sio.emit("error", {"message": "Spiel hat bereits begonnen"}, to=sid)
         return
-    
-    # Check for duplicate names
-    for player in game["players"].values():
-        if player["name"].lower() == player_name.lower():
-            await sio.emit("error", {"message": "Name bereits vergeben"}, to=sid)
-            return
     
     # Add to database
     if not db.add_player(game_code, sid, player_name):
