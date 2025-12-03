@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QuizKnaller 💥 - Wissen macht BUMM!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,10 +19,10 @@
             </div>
             <div class="join-form">
                 <div class="input-group">
-                    <input type="text" id="game-code" placeholder="Spiel-Code" maxlength="6" autocomplete="off">
+                    <input type="text" id="game-code" placeholder="Spiel-Code" maxlength="6" autocomplete="off" inputmode="text">
                 </div>
                 <div class="input-group">
-                    <input type="text" id="player-name" placeholder="Dein Name" maxlength="20" autocomplete="off">
+                    <input type="text" id="player-name" placeholder="Dein Name" maxlength="20" autocomplete="off" inputmode="text">
                 </div>
                 <button id="join-btn" class="btn-primary">Beitreten 🚀</button>
             </div>
@@ -103,6 +103,9 @@
                 </div>
                 <div class="rank-display" id="rank-display"></div>
                 <div class="streak-display" id="streak-display"></div>
+                <div id="player-autoplay-countdown" class="player-autoplay-countdown" style="display: none;">
+                    Nächste Frage in <span id="player-autoplay-timer">5</span>s
+                </div>
             </div>
         </div>
 

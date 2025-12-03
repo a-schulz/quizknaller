@@ -463,6 +463,25 @@ async def submit_answer(sid, data):
 
 
 @sio.event
+async def autoplay_started(sid, data):
+    """Host signals autoplay countdown has started - forward to players."""
+    game_code = data.get("code")
+    seconds = data.get("seconds", 5)
+    
+    if game_code not in games:
+        return
+    
+    game = games[game_code]
+    
+    if game["host_sid"] != sid:
+        return
+    
+    # Send autoplay countdown to all players
+    for player_sid in game["players"]:
+        await sio.emit("autoplay_countdown", {"seconds": seconds}, to=player_sid)
+
+
+@sio.event
 async def time_up(sid, data):
     """Host signals time is up."""
     game_code = data.get("code")

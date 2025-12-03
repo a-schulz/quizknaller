@@ -936,3 +936,93 @@ html, body {
         padding: 20px 30px;
     }
 }
+
+@media (max-width: 768px) {
+    .lobby-main {
+        flex-direction: column;
+        padding: 20px;
+        gap: 20px;
+    }
+    
+    .join-info {
+        flex: none;
+        max-width: 100%;
+        padding: 20px;
+        max-height: none;
+        overflow-y: visible;
+    }
+    
+    .qr-code {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .join-url {
+        font-size: 1.5rem;
+    }
+    
+    .code-value {
+        font-size: 2.5rem;
+        letter-spacing: 5px;
+    }
+    
+    .players-section {
+        min-height: 200px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .players-section h3 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+    
+    .players-grid {
+        gap: 10px;
+    }
+    
+    .player-chip {
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+    
+    .team-header {
+        font-size: 1.2rem;
+        padding: 8px 0;
+    }
+    
+    .lobby-header {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .logo-small {
+        font-size: 1.5rem;
+    }
+    
+    .quiz-info {
+        font-size: 1rem;
+    }
+    
+    .lobby-footer {
+        padding: 20px;
+    }
+    
+    .btn-start {
+        padding: 15px 40px;
+        font-size: 1.4rem;
+    }
+    
+    .autoplay-toggle {
+        font-size: 1rem;
+    }
+    
+    .team-config {
+        padding: 10px;
+    }
+    
+    .team-mode-toggle {
+        font-size: 0.9rem;
+    }
+}

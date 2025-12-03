@@ -511,6 +511,9 @@ socket.on('show_results', (data) => {
             elements.autoplayTimer.textContent = countdown;
             elements.autoplayCountdown.style.display = 'block';
             
+            // Notify players about autoplay countdown
+            socket.emit('autoplay_started', { code: gameCode, seconds: countdown });
+            
             autoplayCountdownInterval = setInterval(() => {
                 countdown--;
                 elements.autoplayTimer.textContent = countdown;

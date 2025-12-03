@@ -4,6 +4,7 @@ const socket = io();
 let gameCode = null;
 let timeLimit = 20;
 let timerInterval = null;
+let autoplayCountdownInterval = null;
 
 // DOM Elements
 const screens = {
@@ -39,7 +40,9 @@ const elements = {
     resultScreen: document.getElementById('result-screen'),
     finalRank: document.getElementById('final-rank'),
     finalScore: document.getElementById('final-score'),
-    playAgainBtn: document.getElementById('play-again-btn')
+    playAgainBtn: document.getElementById('play-again-btn'),
+    playerAutoplayCountdown: document.getElementById('player-autoplay-countdown'),
+    playerAutoplayTimer: document.getElementById('player-autoplay-timer')
 };
 
 // Helper functions
@@ -110,8 +113,19 @@ socket.on('error', (data) => {
     showError(data.message);
 });
 
-// Try to reconnect on page load
+// Try to reconnect on page load or auto-fill code from URL
 window.addEventListener('load', () => {
+    // Check for game code in URL (from QR code scan)
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromUrl = urlParams.get('code');
+    
+    if (codeFromUrl) {
+        elements.gameCodeInput.value = codeFromUrl.toUpperCase();
+        // Focus on name input since code is already filled
+        elements.playerNameInput.focus();
+    }
+    
+    // Try to reconnect if we have saved session
     const savedGameCode = localStorage.getItem('playerGameCode');
     const savedPlayerName = localStorage.getItem('playerName');
     if (savedGameCode && savedPlayerName) {
@@ -250,6 +264,12 @@ socket.on('answer_received', () => {
 
 socket.on('your_result', (data) => {
     if (timerInterval) clearInterval(timerInterval);
+    if (autoplayCountdownInterval) clearInterval(autoplayCountdownInterval);
+    
+    // Hide autoplay countdown initially
+    if (elements.playerAutoplayCountdown) {
+        elements.playerAutoplayCountdown.style.display = 'none';
+    }
     
     if (data.correct) {
         elements.resultScreen.classList.remove('incorrect');
@@ -276,6 +296,28 @@ socket.on('your_result', (data) => {
     }
     
     showScreen('result');
+});
+
+// Handle autoplay countdown from host
+socket.on('autoplay_countdown', (data) => {
+    if (elements.playerAutoplayCountdown && elements.playerAutoplayTimer) {
+        let countdown = data.seconds || 5;
+        elements.playerAutoplayTimer.textContent = countdown;
+        elements.playerAutoplayCountdown.style.display = 'block';
+        
+        if (autoplayCountdownInterval) clearInterval(autoplayCountdownInterval);
+        
+        autoplayCountdownInterval = setInterval(() => {
+            countdown--;
+            elements.playerAutoplayTimer.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(autoplayCountdownInterval);
+                autoplayCountdownInterval = null;
+                elements.playerAutoplayCountdown.style.display = 'none';
+            }
+        }, 1000);
+    }
 });
 
 socket.on('game_ended', (data) => {
@@ -312,8 +354,17 @@ socket.on('game_ended', (data) => {
     showScreen('final');
 });
 
-// Prevent zoom on double tap
+// Prevent zoom on double tap, but allow input fields to work properly
+let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    e.target.click();
+    // Allow input fields to work normally (shows keyboard)
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return;
+    }
+    
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+    }
+    lastTouchEnd = now;
 }, { passive: false });
