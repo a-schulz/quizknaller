@@ -42,6 +42,9 @@ host_disconnect_tasks: dict[str, asyncio.Task] = {}
 
 # Configuration
 HOST_RECONNECT_GRACE_PERIOD = 60  # seconds to wait before ending game after host disconnect
+READING_SPEED_WPM = 150  # words per minute for reading phase (lower = more time)
+MIN_READING_TIME = 2  # minimum seconds for reading phase
+MAX_READING_TIME = 8  # maximum seconds for reading phase
 
 # Load quiz data
 QUIZ_FILE = Path(__file__).parent / "quizzes.json"
@@ -52,6 +55,15 @@ def load_quizzes() -> list[dict]:
         with open(QUIZ_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return []
+
+
+def calculate_reading_time(text: str) -> float:
+    """Calculate reading time based on word count."""
+    word_count = len(text.split())
+    # Calculate time in seconds based on words per minute
+    reading_time = (word_count / READING_SPEED_WPM) * 60
+    # Clamp to min/max bounds
+    return max(MIN_READING_TIME, min(MAX_READING_TIME, reading_time))
 
 
 def generate_game_code() -> str:
@@ -510,28 +522,51 @@ async def next_question(game_code: str):
         return
     
     question = game["quiz"]["questions"][game["current_question"]]
-    game["state"] = "question"
-    game["question_start_time"] = asyncio.get_event_loop().time()
+    game["state"] = "reading"  # New state for reading phase
+    
+    # Calculate reading time based on question length
+    reading_time = calculate_reading_time(question["question"])
     
     # Sync to database
     sync_game_to_db(game_code)
     
-    # Send question to host (with correct answer)
-    await sio.emit("show_question", {
+    # Send reading phase to host (question only, no timer yet)
+    await sio.emit("show_question_reading", {
         "question_num": game["current_question"] + 1,
         "total_questions": len(game["quiz"]["questions"]),
         "question": question["question"],
+        "reading_time": reading_time,
+    }, to=game["host_sid"])
+    
+    # Send reading phase to players (question only)
+    for player_sid in game["players"]:
+        await sio.emit("show_question_reading", {
+            "question_num": game["current_question"] + 1,
+            "total_questions": len(game["quiz"]["questions"]),
+            "question": question["question"],
+            "reading_time": reading_time,
+        }, to=player_sid)
+    
+    # Wait for reading time, then show answers
+    await asyncio.sleep(reading_time)
+    
+    # Check if game still exists and is still in reading state
+    if game_code not in games or games[game_code]["state"] != "reading":
+        return
+    
+    game["state"] = "question"
+    game["question_start_time"] = asyncio.get_event_loop().time()
+    
+    # Send answers to host (with correct answer)
+    await sio.emit("show_answers", {
         "answers": question["answers"],
         "correct_index": question["correct"],
         "time_limit": question.get("time_limit", 20),
     }, to=game["host_sid"])
     
-    # Send question to players (without correct answer)
+    # Send answers to players (without correct answer)
     for player_sid in game["players"]:
-        await sio.emit("show_question", {
-            "question_num": game["current_question"] + 1,
-            "total_questions": len(game["quiz"]["questions"]),
-            "question": question["question"],
+        await sio.emit("show_answers", {
             "answers": question["answers"],
             "time_limit": question.get("time_limit", 20),
         }, to=player_sid)

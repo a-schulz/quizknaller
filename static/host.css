@@ -816,6 +816,21 @@ html, body {
     transform: scale(0.95);
 }
 
+.answer-option.hidden {
+    visibility: hidden;
+}
+
+/* Reading phase timer */
+.timer-progress.reading {
+    stroke: var(--accent-orange);
+    animation: pulse-reading 1s ease-in-out infinite;
+}
+
+@keyframes pulse-reading {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 /* Results Screen */
 #results-screen {
     background: var(--dark);

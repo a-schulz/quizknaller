@@ -433,6 +433,93 @@ socket.on('game_starting', () => {
     }, 1000);
 });
 
+// Reading phase - show question only
+socket.on('show_question_reading', (data) => {
+    // Clear previous state
+    if (timerInterval) clearInterval(timerInterval);
+    
+    totalPlayers = parseInt(elements.playerCount.textContent) || totalPlayers;
+    
+    elements.questionNumber.textContent = `Frage ${data.question_num} von ${data.total_questions}`;
+    elements.questionText.textContent = data.question;
+    elements.answeredCount.textContent = '0';
+    elements.totalPlayersDisplay.textContent = totalPlayers;
+    
+    // Hide answer options during reading phase
+    document.querySelectorAll('.answer-option').forEach((option, i) => {
+        option.classList.remove('correct', 'incorrect');
+        option.classList.add('hidden');
+        document.getElementById(`answer-${i}`).textContent = '';
+    });
+    
+    // Show reading countdown in timer
+    elements.timerProgress.style.strokeDashoffset = '0';
+    elements.timerProgress.classList.remove('warning', 'danger');
+    elements.timerProgress.classList.add('reading');
+    elements.timerText.textContent = '📖';
+    
+    showScreen('question');
+    
+    // Animate reading countdown
+    let readingTimeLeft = data.reading_time;
+    const circumference = 283;
+    
+    timerInterval = setInterval(() => {
+        readingTimeLeft -= 0.1;
+        const progress = readingTimeLeft / data.reading_time;
+        elements.timerProgress.style.strokeDashoffset = circumference * (1 - progress);
+        
+        if (readingTimeLeft <= 0) {
+            clearInterval(timerInterval);
+        }
+    }, 100);
+});
+
+// Show answers after reading phase
+socket.on('show_answers', (data) => {
+    // Clear reading timer
+    if (timerInterval) clearInterval(timerInterval);
+    
+    correctIndex = data.correct_index;
+    timeLimit = data.time_limit;
+    
+    // Reveal answer options
+    data.answers.forEach((answer, i) => {
+        document.getElementById(`answer-${i}`).textContent = answer;
+        const option = document.querySelector(`.answer-option.answer-${i}`);
+        option.classList.remove('hidden', 'correct', 'incorrect');
+    });
+    
+    // Reset and start answer timer
+    elements.timerProgress.style.strokeDashoffset = '0';
+    elements.timerProgress.classList.remove('warning', 'danger', 'reading');
+    elements.timerText.textContent = timeLimit;
+    
+    // Start timer
+    let timeLeft = timeLimit;
+    const circumference = 283;
+    
+    timerInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        const progress = timeLeft / timeLimit;
+        elements.timerProgress.style.strokeDashoffset = circumference * (1 - progress);
+        elements.timerText.textContent = Math.ceil(timeLeft);
+        
+        if (progress < 0.25) {
+            elements.timerProgress.classList.add('danger');
+            elements.timerProgress.classList.remove('warning');
+        } else if (progress < 0.5) {
+            elements.timerProgress.classList.add('warning');
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            socket.emit('time_up', { code: gameCode });
+        }
+    }, 100);
+});
+
+// Legacy handler for backwards compatibility
 socket.on('show_question', (data) => {
     // Clear previous state
     if (timerInterval) clearInterval(timerInterval);
@@ -450,12 +537,12 @@ socket.on('show_question', (data) => {
     data.answers.forEach((answer, i) => {
         document.getElementById(`answer-${i}`).textContent = answer;
         const option = document.querySelector(`.answer-option.answer-${i}`);
-        option.classList.remove('correct', 'incorrect');
+        option.classList.remove('correct', 'incorrect', 'hidden');
     });
     
     // Reset timer
     elements.timerProgress.style.strokeDashoffset = '0';
-    elements.timerProgress.classList.remove('warning', 'danger');
+    elements.timerProgress.classList.remove('warning', 'danger', 'reading');
     elements.timerText.textContent = timeLimit;
     
     showScreen('question');

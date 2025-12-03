@@ -286,6 +286,80 @@ socket.on('game_starting', () => {
     }, 1000);
 });
 
+// Reading phase - show question only
+socket.on('show_question_reading', (data) => {
+    // Clear previous state
+    if (timerInterval) clearInterval(timerInterval);
+    
+    elements.questionNumber.textContent = `${data.question_num}/${data.total_questions}`;
+    elements.questionText.textContent = data.question;
+    
+    // Hide answer buttons during reading phase
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(btn => {
+        btn.textContent = '';
+        btn.classList.add('hidden');
+        btn.classList.remove('disabled', 'selected');
+    });
+    
+    // Show reading indicator in timer bar
+    elements.timerFill.style.width = '100%';
+    elements.timerFill.classList.remove('warning', 'danger');
+    elements.timerFill.classList.add('reading');
+    
+    showScreen('question');
+    
+    // Animate reading countdown
+    let readingTimeLeft = data.reading_time;
+    timerInterval = setInterval(() => {
+        readingTimeLeft -= 0.1;
+        const percent = (readingTimeLeft / data.reading_time) * 100;
+        elements.timerFill.style.width = `${percent}%`;
+        
+        if (readingTimeLeft <= 0) {
+            clearInterval(timerInterval);
+        }
+    }, 100);
+});
+
+// Show answers after reading phase
+socket.on('show_answers', (data) => {
+    // Clear reading timer
+    if (timerInterval) clearInterval(timerInterval);
+    
+    timeLimit = data.time_limit;
+    
+    // Reveal answer buttons
+    const buttons = document.querySelectorAll('.answer-btn');
+    data.answers.forEach((answer, i) => {
+        buttons[i].textContent = answer;
+        buttons[i].classList.remove('hidden', 'disabled', 'selected');
+    });
+    
+    // Reset and start answer timer
+    elements.timerFill.style.width = '100%';
+    elements.timerFill.classList.remove('warning', 'danger', 'reading');
+    
+    let timeLeft = timeLimit;
+    timerInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        const percent = (timeLeft / timeLimit) * 100;
+        elements.timerFill.style.width = `${percent}%`;
+        
+        if (percent < 25) {
+            elements.timerFill.classList.add('danger');
+            elements.timerFill.classList.remove('warning');
+        } else if (percent < 50) {
+            elements.timerFill.classList.add('warning');
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+        }
+    }, 100);
+});
+
+// Legacy handler for backwards compatibility
 socket.on('show_question', (data) => {
     // Clear previous state
     if (timerInterval) clearInterval(timerInterval);
@@ -298,12 +372,12 @@ socket.on('show_question', (data) => {
     const buttons = document.querySelectorAll('.answer-btn');
     data.answers.forEach((answer, i) => {
         buttons[i].textContent = answer;
-        buttons[i].classList.remove('disabled', 'selected');
+        buttons[i].classList.remove('disabled', 'selected', 'hidden');
     });
     
     // Reset and start timer
     elements.timerFill.style.width = '100%';
-    elements.timerFill.classList.remove('warning', 'danger');
+    elements.timerFill.classList.remove('warning', 'danger', 'reading');
     
     showScreen('question');
     

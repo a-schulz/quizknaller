@@ -385,6 +385,22 @@ html, body {
     opacity: 0.5;
 }
 
+.answer-btn.hidden {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Reading phase timer */
+.timer-fill.reading {
+    background: var(--accent-orange);
+    animation: pulse-reading 1s ease-in-out infinite;
+}
+
+@keyframes pulse-reading {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
 /* Answered Screen */
 #answered-screen {
     justify-content: center;
