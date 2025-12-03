@@ -677,6 +677,27 @@ async def next_question_request(sid, data):
     await next_question(game_code)
 
 
+@sio.event
+async def end_game_request(sid, data):
+    """Host requests to end the game early."""
+    game_code = data.get("code")
+    
+    if game_code not in games:
+        return
+    
+    game = games[game_code]
+    
+    if game["host_sid"] != sid:
+        return
+    
+    # Notify all players that the game has ended
+    await sio.emit("game_ended", {"message": "Das Spiel wurde vom Host beendet."}, room=game_code)
+    
+    # Clean up the game
+    if game_code in games:
+        del games[game_code]
+
+
 async def end_game(game_code: str):
     """End the game and show final leaderboard."""
     if game_code not in games:

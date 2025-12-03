@@ -29,12 +29,25 @@ const elements = {
     playerCount: document.getElementById('player-count'),
     playersGrid: document.getElementById('players-grid'),
     startGameBtn: document.getElementById('start-game-btn'),
+    endGameBtn: document.getElementById('end-game-btn'),
     autoplayCheckbox: document.getElementById('autoplay-checkbox'),
+    // Desktop team config elements
     teamModeCheckbox: document.getElementById('team-mode-checkbox'),
     teamSettings: document.getElementById('team-settings'),
     teamsInput: document.getElementById('teams-input'),
     topNInput: document.getElementById('top-n-input'),
     saveTeamsBtn: document.getElementById('save-teams-btn'),
+    // Mobile team config elements
+    teamModeCheckboxMobile: document.getElementById('team-mode-checkbox-mobile'),
+    teamSettingsMobile: document.getElementById('team-settings-mobile'),
+    teamsInputMobile: document.getElementById('teams-input-mobile'),
+    topNInputMobile: document.getElementById('top-n-input-mobile'),
+    saveTeamsBtnMobile: document.getElementById('save-teams-btn-mobile'),
+    // Offcanvas elements
+    teamConfigToggle: document.getElementById('team-config-toggle'),
+    teamConfigOffcanvas: document.getElementById('team-config-offcanvas'),
+    teamConfigClose: document.getElementById('team-config-close'),
+    offcanvasBackdrop: document.getElementById('offcanvas-backdrop'),
     countdownNumber: document.getElementById('countdown-number'),
     questionNumber: document.getElementById('question-number'),
     timerProgress: document.getElementById('timer-progress'),
@@ -177,15 +190,41 @@ socket.on('reconnect_failed', (data) => {
     showScreen('select');
 });
 
+// Offcanvas toggle functions
+function openOffcanvas() {
+    elements.teamConfigOffcanvas.classList.add('open');
+    elements.offcanvasBackdrop.classList.add('open');
+}
+
+function closeOffcanvas() {
+    elements.teamConfigOffcanvas.classList.remove('open');
+    elements.offcanvasBackdrop.classList.remove('open');
+}
+
 // Event Listeners
 elements.startGameBtn.addEventListener('click', () => {
     socket.emit('start_game', { code: gameCode });
 });
 
+elements.endGameBtn.addEventListener('click', () => {
+    if (confirm('Möchtest du das Spiel wirklich beenden?')) {
+        socket.emit('end_game_request', { code: gameCode });
+        gameCode = null;
+        localStorage.removeItem('hostGameCode');
+        showScreen('select');
+    }
+});
+
+// Offcanvas toggle
+elements.teamConfigToggle.addEventListener('click', openOffcanvas);
+elements.teamConfigClose.addEventListener('click', closeOffcanvas);
+elements.offcanvasBackdrop.addEventListener('click', closeOffcanvas);
+
 elements.autoplayCheckbox.addEventListener('change', (e) => {
     autoplayEnabled = e.target.checked;
 });
 
+// Desktop team mode checkbox
 elements.teamModeCheckbox.addEventListener('change', (e) => {
     if (e.target.checked) {
         elements.teamSettings.style.display = 'block';
@@ -201,9 +240,54 @@ elements.teamModeCheckbox.addEventListener('change', (e) => {
     }
 });
 
+// Mobile team mode checkbox
+elements.teamModeCheckboxMobile.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        elements.teamSettingsMobile.style.display = 'block';
+    } else {
+        elements.teamSettingsMobile.style.display = 'none';
+        // Disable team mode
+        socket.emit('configure_teams', {
+            code: gameCode,
+            team_mode: false,
+            teams: [],
+            top_n_players: 3
+        });
+    }
+});
+
+// Desktop save teams
 elements.saveTeamsBtn.addEventListener('click', () => {
     const teamsText = elements.teamsInput.value.trim();
     const topN = parseInt(elements.topNInput.value) || 3;
+    
+    if (!teamsText) {
+        alert('Bitte geben Sie mindestens ein Team ein');
+        return;
+    }
+    
+    const teams = teamsText.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    
+    if (teams.length < 2) {
+        alert('Bitte geben Sie mindestens 2 Teams ein');
+        return;
+    }
+    
+    socket.emit('configure_teams', {
+        code: gameCode,
+        team_mode: true,
+        teams: teams,
+        top_n_players: topN
+    });
+    
+    alert('Team-Konfiguration gespeichert!');
+    closeOffcanvas();
+});
+
+// Mobile save teams
+elements.saveTeamsBtnMobile.addEventListener('click', () => {
+    const teamsText = elements.teamsInputMobile.value.trim();
+    const topN = parseInt(elements.topNInputMobile.value) || 3;
     
     if (!teamsText) {
         alert('Bitte geben Sie mindestens ein Team ein');
@@ -507,7 +591,7 @@ socket.on('show_results', (data) => {
         
         // Auto-advance to next question if autoplay is enabled
         if (autoplayEnabled) {
-            let countdown = 5;
+            let countdown = 10;
             elements.autoplayTimer.textContent = countdown;
             elements.autoplayCountdown.style.display = 'block';
             

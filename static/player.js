@@ -123,9 +123,13 @@ window.addEventListener('load', () => {
         elements.gameCodeInput.value = codeFromUrl.toUpperCase();
         // Focus on name input since code is already filled
         elements.playerNameInput.focus();
+        // Clear the URL parameter without reloading the page
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Don't try to reconnect if coming from QR code - let user enter their name
+        return;
     }
     
-    // Try to reconnect if we have saved session
+    // Try to reconnect if we have saved session (only if not from QR code)
     const savedGameCode = localStorage.getItem('playerGameCode');
     const savedPlayerName = localStorage.getItem('playerName');
     if (savedGameCode && savedPlayerName) {
@@ -322,11 +326,20 @@ socket.on('autoplay_countdown', (data) => {
 
 socket.on('game_ended', (data) => {
     if (timerInterval) clearInterval(timerInterval);
+    if (autoplayCountdownInterval) {
+        clearInterval(autoplayCountdownInterval);
+        autoplayCountdownInterval = null;
+    }
+    
+    gameCode = null;
     localStorage.removeItem('playerGameCode');
     localStorage.removeItem('playerName');
     
-    if (data.reason) {
-        showError(data.reason);
+    if (data.reason || data.message) {
+        // Show a more prominent notification for game ended by host
+        alert(data.reason || data.message);
+        elements.gameCodeInput.value = '';
+        elements.playerNameInput.value = '';
         showScreen('join');
         return;
     }

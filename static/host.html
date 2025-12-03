@@ -29,41 +29,84 @@
             <div class="quiz-info">
                 <span id="lobby-quiz-title"></span>
             </div>
+            <div class="header-actions">
+                <button id="team-config-toggle" class="btn-team-config" title="Team-Einstellungen">⚙️ Teams</button>
+                <button id="end-game-btn" class="btn-end-game" title="Spiel beenden">❌ Beenden</button>
+            </div>
         </div>
         <div class="lobby-main">
-            <div class="join-info">
-                <div class="qr-code-container">
-                    <img id="qr-code" src="" alt="QR Code" class="qr-code">
-                </div>
-                <p>Beitreten auf</p>
-                <div class="join-url" id="join-url"></div>
-                <div class="game-code-display">
-                    <span class="code-label">Spiel-Code:</span>
-                    <span class="code-value" id="game-code-display"></span>
-                </div>
-                <div class="team-config">
-                    <label class="team-mode-toggle">
-                        <input type="checkbox" id="team-mode-checkbox">
-                        <span>Team-Modus aktivieren</span>
-                    </label>
-                    <div id="team-settings" class="team-settings" style="display: none;">
-                        <div class="team-input-group">
-                            <label>Teams (komma-getrennt):</label>
-                            <input type="text" id="teams-input" placeholder="z.B. Team Rot, Team Blau, Team Grün">
+            <div class="left-panels">
+                <div class="join-info">
+                    <div class="join-code-section">
+                        <div class="game-code-display">
+                            <span class="code-label">Spiel-Code</span>
+                            <span class="code-value" id="game-code-display"></span>
                         </div>
-                        <div class="team-input-group">
-                            <label>Top-Spieler pro Team:</label>
-                            <input type="number" id="top-n-input" value="3" min="1" max="10">
+                        <div class="qr-code-container">
+                            <img id="qr-code" src="" alt="QR Code" class="qr-code">
                         </div>
-                        <button id="save-teams-btn" class="btn-save-teams">Teams speichern</button>
+                        <div class="join-url-section">
+                            <span class="join-url-label">Scanne den QR-Code oder besuche</span>
+                            <div class="join-url" id="join-url"></div>
+                        </div>
                     </div>
                 </div>
+                <!-- Mobile: collapsible team config -->
+                <details class="team-config-panel team-config-mobile">
+                    <summary class="panel-header">
+                        <span class="panel-icon">⚙️</span>
+                        <span>Team-Einstellungen</span>
+                        <span class="panel-chevron">▼</span>
+                    </summary>
+                    <div class="panel-content">
+                        <label class="team-mode-toggle">
+                            <input type="checkbox" id="team-mode-checkbox-mobile">
+                            <span>Team-Modus aktivieren</span>
+                        </label>
+                        <div id="team-settings-mobile" class="team-settings" style="display: none;">
+                            <div class="team-input-group">
+                                <label>Teams (komma-getrennt):</label>
+                                <input type="text" id="teams-input-mobile" placeholder="z.B. Team Rot, Team Blau, Team Grün">
+                            </div>
+                            <div class="team-input-group">
+                                <label>Top-Spieler pro Team:</label>
+                                <input type="number" id="top-n-input-mobile" value="3" min="1" max="10">
+                            </div>
+                            <button id="save-teams-btn-mobile" class="btn-save-teams">Teams speichern</button>
+                        </div>
+                    </div>
+                </details>
             </div>
             <div class="players-section">
                 <h3>Spieler (<span id="player-count">0</span>)</h3>
                 <div class="players-grid" id="players-grid"></div>
             </div>
         </div>
+        <!-- Desktop: offcanvas team config -->
+        <div class="team-config-offcanvas" id="team-config-offcanvas">
+            <div class="offcanvas-header">
+                <h3>⚙️ Team-Einstellungen</h3>
+                <button class="offcanvas-close" id="team-config-close">✕</button>
+            </div>
+            <div class="offcanvas-content">
+                <label class="team-mode-toggle">
+                    <input type="checkbox" id="team-mode-checkbox">
+                    <span>Team-Modus aktivieren</span>
+                </label>
+                <div id="team-settings" class="team-settings" style="display: none;">
+                    <div class="team-input-group">
+                        <label>Teams (komma-getrennt):</label>
+                        <input type="text" id="teams-input" placeholder="z.B. Team Rot, Team Blau, Team Grün">
+                    </div>
+                    <div class="team-input-group">
+                        <label>Top-Spieler pro Team:</label>
+                        <input type="number" id="top-n-input" value="3" min="1" max="10">
+                    </div>
+                    <button id="save-teams-btn" class="btn-save-teams">Teams speichern</button>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas-backdrop" id="offcanvas-backdrop"></div>
         <div class="lobby-footer">
             <label class="autoplay-toggle">
                 <input type="checkbox" id="autoplay-checkbox">
