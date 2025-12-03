@@ -16,8 +16,10 @@ Ein Kahoot-ähnliches Quiz-Spiel mit einer mobil-optimierten Spieleransicht und 
 - ▶️ **Autoplay-Modus** - Automatisches Durchlaufen der Fragen für nahtloses Spiel
 - 🎄 **Weihnachtsquiz** - Spezielles Quiz mit 15 Weihnachtsfragen
 - 🏆 **Podium & Konfetti** - Feierliches Spielende
+- 💾 **SQLite Persistenz** - Spieldaten werden in Datenbank gespeichert
+- 🔄 **Reconnect-Funktion** - Spieler können nach Verbindungsabbruch wieder einsteigen
 
-## Schnellstart
+## Schnellstart (Lokal)
 
 ```bash
 # Abhängigkeiten installieren
@@ -28,6 +30,27 @@ uv run python main.py
 ```
 
 Der Server startet auf `http://localhost:8000`.
+
+## Deployment auf Netcup
+
+**Live:** https://rubberducking.ninja
+
+```bash
+# Deployment-Paket hochladen
+./upload_to_netcup.sh
+
+# Dann auf dem Server entpacken
+ssh hosting181513@202.61.232.187
+cd rubberducking.ninja
+rm -rf quizknaller
+unzip quizknaller.zip
+rm quizknaller.zip
+exit
+```
+
+Anschließend in Netcup WCP → Python-App → "Neuladen" klicken.
+
+Siehe [NETCUP_DEPLOYMENT.md](NETCUP_DEPLOYMENT.md) für Details.
 
 ## Verwendung
 
