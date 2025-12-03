@@ -37,6 +37,12 @@ db.init_db()
 # In-memory cache for active games (with database persistence)
 games: dict[str, dict] = {}
 
+# Track pending host disconnection cleanup tasks
+host_disconnect_tasks: dict[str, asyncio.Task] = {}
+
+# Configuration
+HOST_RECONNECT_GRACE_PERIOD = 60  # seconds to wait before ending game after host disconnect
+
 # Load quiz data
 QUIZ_FILE = Path(__file__).parent / "quizzes.json"
 
@@ -169,12 +175,26 @@ async def reconnect_host(sid, data):
     game = games[game_code]
     old_host_sid = game["host_sid"]
     
+    # Cancel any pending cleanup task
+    if game_code in host_disconnect_tasks:
+        print(f"Host reconnected to game {game_code}, cancelling cleanup task")
+        host_disconnect_tasks[game_code].cancel()
+        del host_disconnect_tasks[game_code]
+    
+    # Clear disconnected flag
+    game["host_disconnected"] = False
+    
     # Update host SID
     game["host_sid"] = sid
     db.update_game(game_code, host_sid=sid)
     await sio.enter_room(sid, game_code)
     
-    # Send current game state
+    # Notify players that host is back
+    await sio.emit("host_reconnected", {
+        "message": "Der Host ist wieder verbunden!"
+    }, room=game_code)
+    
+    # Send current game state to host
     await sio.emit("reconnected_host", {
         "code": game_code,
         "quiz_title": game["quiz"]["title"],
@@ -259,12 +279,45 @@ async def disconnect(sid):
             }, room=game_code)
             break
         elif sid == game["host_sid"]:
-            # Host disconnected - end the game for all players
-            await sio.emit("game_ended", {"message": "Der Host hat das Spiel verlassen."}, room=game_code)
-            # Give some time for the message to be delivered
-            await asyncio.sleep(0.5)
-            if game_code in games:
-                del games[game_code]
+            # Host disconnected - start grace period for reconnection
+            print(f"Host disconnected from game {game_code}, starting {HOST_RECONNECT_GRACE_PERIOD}s grace period")
+            
+            # Mark host as disconnected (but don't delete game)
+            game["host_disconnected"] = True
+            
+            # Notify players that host is temporarily disconnected
+            await sio.emit("host_disconnected", {
+                "message": "Der Host hat die Verbindung verloren. Warte auf Wiederverbindung...",
+                "grace_period": HOST_RECONNECT_GRACE_PERIOD
+            }, room=game_code)
+            
+            # Cancel any existing cleanup task for this game
+            if game_code in host_disconnect_tasks:
+                host_disconnect_tasks[game_code].cancel()
+            
+            # Start cleanup task with grace period
+            async def cleanup_after_grace_period(code: str):
+                try:
+                    await asyncio.sleep(HOST_RECONNECT_GRACE_PERIOD)
+                    # Check if host is still disconnected
+                    if code in games and games[code].get("host_disconnected", False):
+                        print(f"Host did not reconnect to game {code}, ending game")
+                        await sio.emit("game_ended", {
+                            "reason": "Der Host hat das Spiel verlassen."
+                        }, room=code)
+                        await asyncio.sleep(0.5)
+                        if code in games:
+                            del games[code]
+                    # Clean up task reference
+                    if code in host_disconnect_tasks:
+                        del host_disconnect_tasks[code]
+                except asyncio.CancelledError:
+                    # Task was cancelled because host reconnected
+                    pass
+            
+            host_disconnect_tasks[game_code] = asyncio.create_task(
+                cleanup_after_grace_period(game_code)
+            )
             break
 
 

@@ -118,6 +118,17 @@
                 <button id="play-again-btn" class="btn-primary">Nochmal spielen 🔄</button>
             </div>
         </div>
+
+        <!-- Host Disconnected Overlay -->
+        <div id="host-disconnect-overlay" class="host-disconnect-overlay" style="display: none;">
+            <div class="host-disconnect-content">
+                <div class="disconnect-icon">⚠️</div>
+                <h2>Host getrennt</h2>
+                <p>Der Host hat die Verbindung verloren.</p>
+                <p>Warte auf Wiederverbindung...</p>
+                <div class="reconnect-countdown">Spiel endet in <span id="host-reconnect-timer">60</span>s</div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>

@@ -45,8 +45,12 @@ const elements = {
     finalScore: document.getElementById('final-score'),
     playAgainBtn: document.getElementById('play-again-btn'),
     playerAutoplayCountdown: document.getElementById('player-autoplay-countdown'),
-    playerAutoplayTimer: document.getElementById('player-autoplay-timer')
+    playerAutoplayTimer: document.getElementById('player-autoplay-timer'),
+    hostDisconnectOverlay: document.getElementById('host-disconnect-overlay'),
+    hostReconnectTimer: document.getElementById('host-reconnect-timer')
 };
+
+let hostReconnectCountdownInterval = null;
 
 // Helper functions
 function showScreen(screenName) {
@@ -116,6 +120,44 @@ elements.playAgainBtn.addEventListener('click', () => {
 // Socket Events
 socket.on('error', (data) => {
     showError(data.message);
+});
+
+// Handle host disconnection
+socket.on('host_disconnected', (data) => {
+    const gracePeriod = data.grace_period || 60;
+    let countdown = gracePeriod;
+    
+    if (elements.hostDisconnectOverlay && elements.hostReconnectTimer) {
+        elements.hostReconnectTimer.textContent = countdown;
+        elements.hostDisconnectOverlay.style.display = 'flex';
+        
+        // Clear any existing countdown
+        if (hostReconnectCountdownInterval) {
+            clearInterval(hostReconnectCountdownInterval);
+        }
+        
+        hostReconnectCountdownInterval = setInterval(() => {
+            countdown--;
+            elements.hostReconnectTimer.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(hostReconnectCountdownInterval);
+                hostReconnectCountdownInterval = null;
+            }
+        }, 1000);
+    }
+});
+
+// Handle host reconnection
+socket.on('host_reconnected', (data) => {
+    if (hostReconnectCountdownInterval) {
+        clearInterval(hostReconnectCountdownInterval);
+        hostReconnectCountdownInterval = null;
+    }
+    
+    if (elements.hostDisconnectOverlay) {
+        elements.hostDisconnectOverlay.style.display = 'none';
+    }
 });
 
 // Try to reconnect on page load or auto-fill code from URL
