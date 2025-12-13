@@ -1428,5 +1428,652 @@
         "time_limit": 15
       }
     ]
+  },
+  {
+    "title": "Weihnachtsmann & Co. KG 🎅🏭",
+    "questions": [
+      {
+        "question": "In welchem Land wohnt der Weihnachtsmann in der Serie?",
+        "answers": [
+          "Island",
+          "Grönland",
+          "Norwegen",
+          "Finnland"
+        ],
+        "correct": 3,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie heißt das Rentier mit der roten Nase?",
+        "answers": [
+          "Rudolph",
+          "Rudolf",
+          "Rodney",
+          "Ronny"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Wer ist der Hauptgegenspieler des Weihnachtsmanns in der Serie?",
+        "answers": [
+          "Der Osterhase",
+          "Knecht Ruprecht",
+          "Grantelbart",
+          "Der Krampus"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie heißt die Frau des Weihnachtsmanns?",
+        "answers": [
+          "Maria",
+          "Anna",
+          "Frau Holle",
+          "Keine Angabe in der Serie"
+        ],
+        "correct": 3,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Aufgabe hat Trixi in der Weihnachtsmann & Co. KG?",
+        "answers": [
+          "Geschenke einpacken",
+          "Schlitten fahren",
+          "Elfe und Assistentin",
+          "Spielzeug herstellen"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Aus welchem Land stammt die Original-Zeichentrickserie?",
+        "answers": [
+          "Deutschland",
+          "USA",
+          "Frankreich",
+          "Kanada"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Wie heißt das technische Genie unter den Elfen?",
+        "answers": [
+          "Jordi",
+          "Gilfi",
+          "Trixi",
+          "Rudi"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Jahr wurde die Serie erstmals im deutschen Fernsehen ausgestrahlt?",
+        "answers": [
+          "1995",
+          "1997",
+          "1999",
+          "2001"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Wie viele Staffeln hat die Serie insgesamt?",
+        "answers": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Was versucht Grantelbart in der Serie zu erreichen?",
+        "answers": [
+          "Den Weihnachtsmann zu besiegen",
+          "Weihnachten zu verhindern",
+          "Selbst Weihnachtsmann zu werden",
+          "Die Spielzeugfabrik zu übernehmen"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches Verkehrsmittel nutzt der Weihnachtsmann hauptsächlich?",
+        "answers": [
+          "Schneemobil",
+          "Rentierschlitten",
+          "Flugzeug",
+          "Eisenbahn"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Wie heißt der deutsche Synchronsprecher des Weihnachtsmanns?",
+        "answers": [
+          "Manfred Lehmann",
+          "Joachim Kemmer",
+          "Christian Tramitz",
+          "Rolf Zacher"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      }
+    ]
+  },
+  {
+    "title": "Geographie Quiz 🌍",
+    "questions": [
+      {
+        "question": "Welcher ist der längste Fluss der Welt?",
+        "answers": [
+          "Nil",
+          "Amazonas",
+          "Jangtse",
+          "Mississippi"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches ist das flächenmäßig größte Land der Erde?",
+        "answers": [
+          "Kanada",
+          "China",
+          "USA",
+          "Russland"
+        ],
+        "correct": 3,
+        "time_limit": 10
+      },
+      {
+        "question": "In welchem Kontinent liegt die Sahara-Wüste?",
+        "answers": [
+          "Asien",
+          "Afrika",
+          "Australien",
+          "Südamerika"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Welches ist der höchste Berg der Welt?",
+        "answers": [
+          "K2",
+          "Kilimandscharo",
+          "Mount Everest",
+          "Mont Blanc"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Wie viele Kontinente gibt es auf der Erde?",
+        "answers": [
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches ist das bevölkerungsreichste Land der Welt (Stand 2024)?",
+        "answers": [
+          "China",
+          "Indien",
+          "USA",
+          "Indonesien"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Ozean ist der größte?",
+        "answers": [
+          "Atlantischer Ozean",
+          "Indischer Ozean",
+          "Pazifischer Ozean",
+          "Arktischer Ozean"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches Land hat die meisten Zeitzonen (inkl. Überseegebiete)?",
+        "answers": [
+          "USA",
+          "Russland",
+          "Frankreich",
+          "Kanada"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welcher Inselstaat ist der kleinste der Welt (nach Fläche)?",
+        "answers": [
+          "Nauru",
+          "Tuvalu",
+          "Malediven",
+          "Malta"
+        ],
+        "correct": 0,
+        "time_limit": 20
+      },
+      {
+        "question": "Welcher Fluss fließt durch die meisten Länder?",
+        "answers": [
+          "Rhein",
+          "Donau",
+          "Nil",
+          "Amazonas"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "In welchem Land befindet sich der tiefste Punkt der Erde?",
+        "answers": [
+          "USA",
+          "Japan",
+          "Philippinen",
+          "Russland"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches ist die trockenste Wüste der Welt?",
+        "answers": [
+          "Sahara",
+          "Gobi",
+          "Atacama",
+          "Kalahari"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie viele Länder gibt es auf der Erde (Stand 2024)?",
+        "answers": [
+          "173",
+          "183",
+          "193",
+          "203"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches Land hat die längste Küstenlinie der Welt?",
+        "answers": [
+          "Australien",
+          "Russland",
+          "Kanada",
+          "Indonesien"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welcher See ist der tiefste der Welt?",
+        "answers": [
+          "Tanganjikasee",
+          "Baikalsee",
+          "Victoriasee",
+          "Kaspisches Meer"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      }
+    ]
+  },
+  {
+    "title": "Topographie Quiz 🗺️",
+    "questions": [
+      {
+        "question": "Welche Stadt ist die Hauptstadt von Deutschland?",
+        "answers": [
+          "München",
+          "Hamburg",
+          "Berlin",
+          "Frankfurt"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Stadt ist die Hauptstadt von Frankreich?",
+        "answers": [
+          "Lyon",
+          "Marseille",
+          "Paris",
+          "Toulouse"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Stadt liegt am weitesten nördlich?",
+        "answers": [
+          "Stockholm",
+          "Oslo",
+          "Helsinki",
+          "Reykjavik"
+        ],
+        "correct": 3,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Berg ist der höchste in den Alpen?",
+        "answers": [
+          "Matterhorn",
+          "Mont Blanc",
+          "Zugspitze",
+          "Großglockner"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Fluss fließt durch Wien?",
+        "answers": [
+          "Elbe",
+          "Donau",
+          "Rhein",
+          "Inn"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "In welchem Bundesland liegt München?",
+        "answers": [
+          "Baden-Württemberg",
+          "Bayern",
+          "Hessen",
+          "Nordrhein-Westfalen"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Stadt wird auch 'Elbflorenz' genannt?",
+        "answers": [
+          "Hamburg",
+          "Leipzig",
+          "Dresden",
+          "Magdeburg"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher ist der längste Fluss Deutschlands?",
+        "answers": [
+          "Elbe",
+          "Rhein",
+          "Donau",
+          "Weser"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Gebirge liegt die Zugspitze?",
+        "answers": [
+          "Schwarzwald",
+          "Alpen",
+          "Harz",
+          "Erzgebirge"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Welches Bundesland ist flächenmäßig das größte in Deutschland?",
+        "answers": [
+          "Niedersachsen",
+          "Baden-Württemberg",
+          "Bayern",
+          "Nordrhein-Westfalen"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "An welchem Meer liegt Hamburg?",
+        "answers": [
+          "Nordsee",
+          "Ostsee",
+          "An keinem Meer direkt",
+          "Mittelmeer"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Stadt ist die Hauptstadt von Österreich?",
+        "answers": [
+          "Salzburg",
+          "Graz",
+          "Wien",
+          "Innsbruck"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Stadt ist die Hauptstadt der Schweiz?",
+        "answers": [
+          "Zürich",
+          "Genf",
+          "Basel",
+          "Bern"
+        ],
+        "correct": 3,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher See ist der größte in Deutschland?",
+        "answers": [
+          "Chiemsee",
+          "Bodensee",
+          "Müritz",
+          "Starnberger See"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Bundesland liegt der Schwarzwald?",
+        "answers": [
+          "Bayern",
+          "Baden-Württemberg",
+          "Rheinland-Pfalz",
+          "Hessen"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      }
+    ]
+  },
+  {
+    "title": "Marken Quiz 🏷️",
+    "questions": [
+      {
+        "question": "Welches Tier ist das Logo von Ferrari?",
+        "answers": [
+          "Löwe",
+          "Pferd",
+          "Stier",
+          "Panther"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Marke hat den Slogan 'Just Do It'?",
+        "answers": [
+          "Adidas",
+          "Puma",
+          "Nike",
+          "Reebok"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Aus welchem Land stammt die Marke IKEA?",
+        "answers": [
+          "Norwegen",
+          "Dänemark",
+          "Finnland",
+          "Schweden"
+        ],
+        "correct": 3,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches Unternehmen produziert das iPhone?",
+        "answers": [
+          "Samsung",
+          "Apple",
+          "Google",
+          "Microsoft"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Marke hat drei Streifen als Logo?",
+        "answers": [
+          "Nike",
+          "Puma",
+          "Adidas",
+          "Under Armour"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Welches Tier ist im Logo von Puma?",
+        "answers": [
+          "Leopard",
+          "Puma/Berglöwe",
+          "Gepard",
+          "Tiger"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Automarke hat vier Ringe als Logo?",
+        "answers": [
+          "BMW",
+          "Mercedes",
+          "Audi",
+          "Volkswagen"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Aus welchem Land stammt die Automarke Toyota?",
+        "answers": [
+          "China",
+          "Südkorea",
+          "Japan",
+          "Thailand"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Fast-Food-Kette hat ein großes 'M' als Logo?",
+        "answers": [
+          "Burger King",
+          "KFC",
+          "McDonald's",
+          "Subway"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Welcher Konzern gehört die Marke WhatsApp?",
+        "answers": [
+          "Google",
+          "Meta (Facebook)",
+          "Microsoft",
+          "Apple"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Marke ist bekannt für die Farbe Rot und den Schriftzug mit weißer Schrift?",
+        "answers": [
+          "Pepsi",
+          "Coca-Cola",
+          "Red Bull",
+          "Fanta"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Aus welchem Land stammt die Marke Samsung?",
+        "answers": [
+          "Japan",
+          "China",
+          "Südkorea",
+          "Taiwan"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Luxusmarke hat zwei ineinander verschlungene 'C' als Logo?",
+        "answers": [
+          "Gucci",
+          "Louis Vuitton",
+          "Chanel",
+          "Prada"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Firma stellt die PlayStation her?",
+        "answers": [
+          "Microsoft",
+          "Nintendo",
+          "Sony",
+          "Sega"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Welches Unternehmen besitzt die Marke YouTube?",
+        "answers": [
+          "Meta",
+          "Google",
+          "Amazon",
+          "Microsoft"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      }
+    ]
   }
 ]
