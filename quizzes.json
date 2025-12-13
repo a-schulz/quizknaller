@@ -1647,7 +1647,7 @@
         "time_limit": 15
       },
       {
-        "question": "Welches Land hat die meisten Zeitzonen?",
+        "question": "Welches Land hat die meisten Zeitzonen (inkl. Überseegebiete)?",
         "answers": [
           "USA",
           "Russland",
@@ -1658,14 +1658,14 @@
         "time_limit": 20
       },
       {
-        "question": "Welches ist die kleinste Insel der Erde, die gleichzeitig ein eigener Staat ist?",
+        "question": "Welcher Inselstaat ist der kleinste der Welt (nach Fläche)?",
         "answers": [
-          "Vatikanstadt",
-          "Monaco",
           "Nauru",
-          "San Marino"
+          "Tuvalu",
+          "Malediven",
+          "Malta"
         ],
-        "correct": 2,
+        "correct": 0,
         "time_limit": 20
       },
       {
