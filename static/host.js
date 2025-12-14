@@ -174,6 +174,8 @@ function closeOffcanvas() {
 
 // Event Listeners
 elements.startGameBtn.addEventListener('click', () => {
+    // Initialize sound on first user interaction
+    soundManager.init();
     socket.emit('start_game', { code: gameCode });
 });
 
@@ -423,12 +425,17 @@ socket.on('game_starting', () => {
     let count = 3;
     elements.countdownNumber.textContent = count;
     
+    // Play countdown tick sound
+    soundManager.playCountdownTick();
+    
     const countdownInterval = setInterval(() => {
         count--;
         if (count > 0) {
             elements.countdownNumber.textContent = count;
+            soundManager.playCountdownTick();
         } else {
             clearInterval(countdownInterval);
+            soundManager.playCountdownFinal();
         }
     }, 1000);
 });
@@ -437,6 +444,11 @@ socket.on('game_starting', () => {
 socket.on('show_question_reading', (data) => {
     // Clear previous state
     if (timerInterval) clearInterval(timerInterval);
+    
+    // Start background music on first question
+    if (data.question_num === 1) {
+        soundManager.startBackgroundMusic();
+    }
     
     totalPlayers = parseInt(elements.playerCount.textContent) || totalPlayers;
     
@@ -580,6 +592,9 @@ socket.on('answer_update', (data) => {
 socket.on('show_results', (data) => {
     if (timerInterval) clearInterval(timerInterval);
     
+    // Play round end sound
+    soundManager.playRoundEndSound();
+    
     // Highlight correct/incorrect answers
     document.querySelectorAll('.answer-option').forEach((option, i) => {
         if (i === data.correct_index) {
@@ -648,6 +663,12 @@ socket.on('show_results', (data) => {
 socket.on('game_ended', (data) => {
     if (timerInterval) clearInterval(timerInterval);
     localStorage.removeItem('hostGameCode');
+    
+    // Stop background music
+    soundManager.stopBackgroundMusic();
+    
+    // Play celebration sound for final leaderboard
+    soundManager.playCelebrationSound();
     
     if (data.reason) {
         alert(data.reason);
