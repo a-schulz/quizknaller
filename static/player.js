@@ -46,6 +46,7 @@ const elements = {
     playAgainBtn: document.getElementById('play-again-btn'),
     playerAutoplayCountdown: document.getElementById('player-autoplay-countdown'),
     playerAutoplayTimer: document.getElementById('player-autoplay-timer'),
+    playerAutoplayMessage: document.getElementById('player-autoplay-message'),
     hostDisconnectOverlay: document.getElementById('host-disconnect-overlay'),
     hostReconnectTimer: document.getElementById('host-reconnect-timer')
 };
@@ -446,6 +447,16 @@ socket.on('autoplay_countdown', (data) => {
     if (elements.playerAutoplayCountdown && elements.playerAutoplayTimer) {
         let countdown = data.seconds || AUTOPLAY_COUNTDOWN_SECONDS;
         elements.playerAutoplayTimer.textContent = countdown;
+        
+        // Set message based on whether this is the last question
+        if (elements.playerAutoplayMessage) {
+            if (data.is_last_question) {
+                elements.playerAutoplayMessage.textContent = '🎉 Ergebnisse in';
+            } else {
+                elements.playerAutoplayMessage.textContent = 'Nächste Frage in';
+            }
+        }
+        
         elements.playerAutoplayCountdown.style.display = 'block';
         
         if (autoplayCountdownInterval) clearInterval(autoplayCountdownInterval);
