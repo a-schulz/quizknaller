@@ -232,8 +232,9 @@ class SoundManager {
         let currentTime = now;
         const patternDuration = melody.reduce((sum, note) => sum + note.duration, 0);
         
-        // Play pattern multiple times (for 60 seconds)
-        const repetitions = Math.ceil(60 / patternDuration);
+        // Play pattern for approximately 2 minutes (enough for typical question rounds)
+        const loopDuration = 120; // 2 minutes
+        const repetitions = Math.ceil(loopDuration / patternDuration);
         
         for (let rep = 0; rep < repetitions; rep++) {
             melody.forEach(({ note, duration }) => {
@@ -242,23 +243,31 @@ class SoundManager {
             });
         }
 
-        // Store reference to stop it later
-        this.backgroundMusic = {
-            startTime: now,
-            duration: repetitions * patternDuration
-        };
-
-        // Auto-restart after duration
-        setTimeout(() => {
-            if (this.backgroundMusic) {
+        // Store reference to stop it later, including timeout for auto-restart
+        const restartTimeout = setTimeout(() => {
+            if (this.backgroundMusic && this.backgroundMusic.active) {
                 this.startBackgroundMusic();
             }
         }, repetitions * patternDuration * 1000);
+
+        this.backgroundMusic = {
+            startTime: now,
+            duration: repetitions * patternDuration,
+            restartTimeout: restartTimeout,
+            active: true
+        };
     }
 
     // Stop background music
     stopBackgroundMusic() {
-        this.backgroundMusic = null;
+        if (this.backgroundMusic) {
+            // Clear the auto-restart timeout to prevent unexpected restarts
+            if (this.backgroundMusic.restartTimeout) {
+                clearTimeout(this.backgroundMusic.restartTimeout);
+            }
+            this.backgroundMusic.active = false;
+            this.backgroundMusic = null;
+        }
     }
 
     // Play countdown tick sound
