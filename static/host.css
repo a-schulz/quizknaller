@@ -925,7 +925,15 @@ html, body {
 .stat-count {
     font-size: 2.5rem;
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
+    z-index: 1;
+}
+
+.stat-percent {
+    font-size: 1.2rem;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-bottom: 10px;
     z-index: 1;
 }
 
