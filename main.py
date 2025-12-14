@@ -633,6 +633,7 @@ async def autoplay_started(sid, data):
     """Host signals autoplay countdown has started - forward to players."""
     game_code = data.get("code")
     seconds = data.get("seconds", 10)  # Default matches AUTOPLAY_COUNTDOWN_SECONDS in JS
+    is_last_question = data.get("is_last_question", False)
     
     if game_code not in games:
         return
@@ -644,7 +645,7 @@ async def autoplay_started(sid, data):
     
     # Send autoplay countdown to all players
     for player_sid in game["players"]:
-        await sio.emit("autoplay_countdown", {"seconds": seconds}, to=player_sid)
+        await sio.emit("autoplay_countdown", {"seconds": seconds, "is_last_question": is_last_question}, to=player_sid)
 
 
 @sio.event
