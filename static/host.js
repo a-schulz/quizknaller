@@ -600,6 +600,7 @@ socket.on('show_results', (data) => {
             const percent = (count / totalAnswers) * 100;
             document.getElementById(`stat-fill-${i}`).style.height = `${percent}%`;
             document.getElementById(`stat-count-${i}`).textContent = count;
+            document.getElementById(`stat-percent-${i}`).textContent = `${Math.round(percent)}%`;
         });
         
         // Update leaderboard preview
