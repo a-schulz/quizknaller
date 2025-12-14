@@ -175,6 +175,8 @@ function closeOffcanvas() {
 
 // Event Listeners
 elements.startGameBtn.addEventListener('click', () => {
+    // Initialize sound on first user interaction
+    soundManager.init();
     socket.emit('start_game', { code: gameCode });
 });
 
@@ -424,12 +426,17 @@ socket.on('game_starting', () => {
     let count = 3;
     elements.countdownNumber.textContent = count;
     
+    // Play countdown tick sound
+    soundManager.playCountdownTick().catch(() => {}); // Silently ignore sound errors
+    
     const countdownInterval = setInterval(() => {
         count--;
         if (count > 0) {
             elements.countdownNumber.textContent = count;
+            soundManager.playCountdownTick().catch(() => {}); // Silently ignore sound errors
         } else {
             clearInterval(countdownInterval);
+            soundManager.playCountdownFinal().catch(() => {}); // Silently ignore sound errors
         }
     }, 1000);
 });
@@ -438,6 +445,11 @@ socket.on('game_starting', () => {
 socket.on('show_question_reading', (data) => {
     // Clear previous state
     if (timerInterval) clearInterval(timerInterval);
+    
+    // Start background music on first question
+    if (data.question_num === 1) {
+        soundManager.startBackgroundMusic().catch(() => {}); // Silently ignore sound errors
+    }
     
     totalPlayers = parseInt(elements.playerCount.textContent) || totalPlayers;
     
@@ -576,10 +588,16 @@ socket.on('answer_update', (data) => {
     elements.answeredCount.textContent = data.answered;
     elements.totalPlayersDisplay.textContent = data.total;
     totalPlayers = data.total;
+    
+    // Play feedback sound when an answer is submitted
+    soundManager.playPopSound().catch(() => {}); // Silently ignore sound errors
 });
 
 socket.on('show_results', (data) => {
     if (timerInterval) clearInterval(timerInterval);
+    
+    // Play round end sound
+    soundManager.playRoundEndSound().catch(() => {}); // Silently ignore sound errors
     
     // Highlight correct/incorrect answers
     document.querySelectorAll('.answer-option').forEach((option, i) => {
@@ -658,6 +676,12 @@ socket.on('show_results', (data) => {
 socket.on('game_ended', (data) => {
     if (timerInterval) clearInterval(timerInterval);
     localStorage.removeItem('hostGameCode');
+    
+    // Stop background music
+    soundManager.stopBackgroundMusic();
+    
+    // Play celebration sound for final leaderboard
+    soundManager.playCelebrationSound().catch(() => {}); // Silently ignore sound errors
     
     if (data.reason) {
         alert(data.reason);

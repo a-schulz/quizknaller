@@ -11,4 +11,6 @@ dependencies = [
     "python-socketio>=5.15.0",
     "qrcode>=8.2",
     "uvicorn>=0.38.0",
+    "pydantic>=2.7.0",
+    "typing_extensions>=4.12.2",
 ]
