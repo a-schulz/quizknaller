@@ -183,87 +183,29 @@ class SoundManager {
     // Start playful background music for rounds
     async startBackgroundMusic() {
         if (this.isMuted) return;
-        await this.ensureContext();
-        if (!this.audioContext) return;
 
         // Stop existing music if any
         this.stopBackgroundMusic();
 
-        const now = this.audioContext.currentTime;
+        // Create HTML5 Audio element for host.mp3
+        this.backgroundMusic = new Audio('/static/host.mp3');
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = this.masterVolume;
         
-        // Create a simple looping melody
-        const playMelodyNote = (frequency, startTime, duration) => {
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            const filterNode = this.audioContext.createBiquadFilter();
-            
-            oscillator.connect(filterNode);
-            filterNode.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            oscillator.type = 'square';
-            oscillator.frequency.setValueAtTime(frequency, startTime);
-            
-            filterNode.type = 'lowpass';
-            filterNode.frequency.setValueAtTime(2000, startTime);
-            
-            gainNode.gain.setValueAtTime(this.masterVolume * 0.15, startTime);
-            gainNode.gain.setValueAtTime(this.masterVolume * 0.15, startTime + duration - 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-            
-            oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
-        };
-
-        // Simple upbeat melody pattern (repeating)
-        const melody = [
-            { note: 523, duration: 0.2 }, // C5
-            { note: 659, duration: 0.2 }, // E5
-            { note: 784, duration: 0.2 }, // G5
-            { note: 659, duration: 0.2 }, // E5
-            { note: 523, duration: 0.2 }, // C5
-            { note: 659, duration: 0.2 }, // E5
-            { note: 784, duration: 0.4 }, // G5
-            { note: 784, duration: 0.4 }, // G5
-        ];
-
-        let currentTime = now;
-        const patternDuration = melody.reduce((sum, note) => sum + note.duration, 0);
-        
-        // Play pattern for approximately 2 minutes (enough for typical question rounds)
-        const loopDuration = 120; // 2 minutes
-        const repetitions = Math.ceil(loopDuration / patternDuration);
-        
-        for (let rep = 0; rep < repetitions; rep++) {
-            melody.forEach(({ note, duration }) => {
-                playMelodyNote(note, currentTime, duration);
-                currentTime += duration;
-            });
+        // Play the music
+        try {
+            await this.backgroundMusic.play();
+        } catch (e) {
+            console.warn('Could not play background music', e);
+            this.backgroundMusic = null;
         }
-
-        // Store reference to stop it later, including timeout for auto-restart
-        const restartTimeout = setTimeout(() => {
-            if (this.backgroundMusic && this.backgroundMusic.active) {
-                this.startBackgroundMusic();
-            }
-        }, Math.round(repetitions * patternDuration * 1000));
-
-        this.backgroundMusic = {
-            startTime: now,
-            duration: repetitions * patternDuration,
-            restartTimeout: restartTimeout,
-            active: true
-        };
     }
 
     // Stop background music
     stopBackgroundMusic() {
         if (this.backgroundMusic) {
-            // Clear the auto-restart timeout to prevent unexpected restarts
-            if (this.backgroundMusic.restartTimeout) {
-                clearTimeout(this.backgroundMusic.restartTimeout);
-            }
-            this.backgroundMusic.active = false;
+            this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0;
             this.backgroundMusic = null;
         }
     }

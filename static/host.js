@@ -588,6 +588,9 @@ socket.on('answer_update', (data) => {
     elements.answeredCount.textContent = data.answered;
     elements.totalPlayersDisplay.textContent = data.total;
     totalPlayers = data.total;
+    
+    // Play feedback sound when an answer is submitted
+    soundManager.playPopSound().catch(() => {}); // Silently ignore sound errors
 });
 
 socket.on('show_results', (data) => {
