@@ -246,7 +246,7 @@ class SoundManager {
             if (this.backgroundMusic && this.backgroundMusic.active) {
                 this.startBackgroundMusic();
             }
-        }, repetitions * patternDuration * 1000);
+        }, Math.round(repetitions * patternDuration * 1000));
 
         this.backgroundMusic = {
             startTime: now,
