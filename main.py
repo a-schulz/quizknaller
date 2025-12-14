@@ -737,12 +737,16 @@ async def show_results(game_code: str):
     # Sort by score
     results.sort(key=lambda x: x["total_score"], reverse=True)
     
+    # Check if this is the last question
+    is_last_question = game["current_question"] >= len(game["quiz"]["questions"]) - 1
+    
     # Send results to host
     await sio.emit("show_results", {
         "correct_index": correct_index,
         "correct_answer": question["answers"][correct_index],
         "answer_counts": answer_counts,
         "results": [{"name": r["name"], "correct": r["correct"], "score_gained": r["score_gained"], "total_score": r["total_score"]} for r in results],
+        "is_last_question": is_last_question,
     }, to=game["host_sid"])
     
     # Send individual results to players
@@ -755,6 +759,7 @@ async def show_results(game_code: str):
             "streak": result["streak"],
             "rank": results.index(result) + 1,
             "total_players": len(results),
+            "is_last_question": is_last_question,
         }, to=result["sid"])
 
 
