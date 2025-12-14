@@ -426,16 +426,16 @@ socket.on('game_starting', () => {
     elements.countdownNumber.textContent = count;
     
     // Play countdown tick sound
-    soundManager.playCountdownTick();
+    soundManager.playCountdownTick().catch(() => {}); // Silently ignore sound errors
     
     const countdownInterval = setInterval(() => {
         count--;
         if (count > 0) {
             elements.countdownNumber.textContent = count;
-            soundManager.playCountdownTick();
+            soundManager.playCountdownTick().catch(() => {}); // Silently ignore sound errors
         } else {
             clearInterval(countdownInterval);
-            soundManager.playCountdownFinal();
+            soundManager.playCountdownFinal().catch(() => {}); // Silently ignore sound errors
         }
     }, 1000);
 });
@@ -447,7 +447,7 @@ socket.on('show_question_reading', (data) => {
     
     // Start background music on first question
     if (data.question_num === 1) {
-        soundManager.startBackgroundMusic();
+        soundManager.startBackgroundMusic().catch(() => {}); // Silently ignore sound errors
     }
     
     totalPlayers = parseInt(elements.playerCount.textContent) || totalPlayers;
@@ -593,7 +593,7 @@ socket.on('show_results', (data) => {
     if (timerInterval) clearInterval(timerInterval);
     
     // Play round end sound
-    soundManager.playRoundEndSound();
+    soundManager.playRoundEndSound().catch(() => {}); // Silently ignore sound errors
     
     // Highlight correct/incorrect answers
     document.querySelectorAll('.answer-option').forEach((option, i) => {
@@ -668,7 +668,7 @@ socket.on('game_ended', (data) => {
     soundManager.stopBackgroundMusic();
     
     // Play celebration sound for final leaderboard
-    soundManager.playCelebrationSound();
+    soundManager.playCelebrationSound().catch(() => {}); // Silently ignore sound errors
     
     if (data.reason) {
         alert(data.reason);

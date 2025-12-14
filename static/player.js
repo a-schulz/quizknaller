@@ -103,7 +103,7 @@ document.querySelectorAll('.answer-btn').forEach(btn => {
         socket.emit('submit_answer', { code: gameCode, answer: answerIndex });
         
         // Play pop sound when answer is submitted
-        soundManager.playPopSound();
+        soundManager.playPopSound().catch(() => {}); // Silently ignore sound errors
         
         // Disable all buttons and mark selected
         document.querySelectorAll('.answer-btn').forEach(b => {
@@ -283,16 +283,16 @@ socket.on('game_starting', () => {
     elements.startCountdown.textContent = count;
     
     // Play countdown tick sound
-    soundManager.playCountdownTick();
+    soundManager.playCountdownTick().catch(() => {}); // Silently ignore sound errors
     
     const countdownInterval = setInterval(() => {
         count--;
         if (count > 0) {
             elements.startCountdown.textContent = count;
-            soundManager.playCountdownTick();
+            soundManager.playCountdownTick().catch(() => {}); // Silently ignore sound errors
         } else {
             clearInterval(countdownInterval);
-            soundManager.playCountdownFinal();
+            soundManager.playCountdownFinal().catch(() => {}); // Silently ignore sound errors
         }
     }, 1000);
 });
@@ -431,14 +431,14 @@ socket.on('your_result', (data) => {
         elements.resultIcon.textContent = '✓';
         elements.resultTitle.textContent = 'Richtig!';
         // Play success sound for correct answer
-        soundManager.playSuccessSound();
+        soundManager.playSuccessSound().catch(() => {}); // Silently ignore sound errors
     } else {
         elements.resultScreen.classList.remove('correct');
         elements.resultScreen.classList.add('incorrect');
         elements.resultIcon.textContent = '✗';
         elements.resultTitle.textContent = 'Falsch!';
         // Play error sound for incorrect answer
-        soundManager.playErrorSound();
+        soundManager.playErrorSound().catch(() => {}); // Silently ignore sound errors
     }
     
     elements.correctAnswer.textContent = `Richtige Antwort: ${data.correct_answer}`;

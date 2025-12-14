@@ -213,8 +213,6 @@ class SoundManager {
             
             oscillator.start(startTime);
             oscillator.stop(startTime + duration);
-            
-            return oscillator;
         };
 
         // Simple upbeat melody pattern (repeating)
