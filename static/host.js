@@ -68,6 +68,7 @@ const elements = {
     nextQuestionBtn: document.getElementById('next-question-btn'),
     autoplayCountdown: document.getElementById('autoplay-countdown'),
     autoplayTimer: document.getElementById('autoplay-timer'),
+    autoplayMessage: document.getElementById('autoplay-message'),
     podium: document.getElementById('podium'),
     fullLeaderboard: document.getElementById('full-leaderboard'),
     newGameBtn: document.getElementById('new-game-btn'),
@@ -610,11 +611,12 @@ socket.on('show_results', (data) => {
         elements.correctAnswerBox.className = `correct-answer-box answer-${data.correct_index}`;
         
         // Update answer stats
-        const totalAnswers = data.answer_counts.reduce((a, b) => a + b, 0) || 1;
+        const totalAnswers = data.answer_counts.reduce((a, b) => a + b, 0);
         data.answer_counts.forEach((count, i) => {
-            const percent = (count / totalAnswers) * 100;
+            const percent = totalAnswers > 0 ? (count / totalAnswers) * 100 : 0;
             document.getElementById(`stat-fill-${i}`).style.height = `${percent}%`;
             document.getElementById(`stat-count-${i}`).textContent = count;
+            document.getElementById(`stat-percent-${i}`).textContent = `${Math.round(percent)}%`;
         });
         
         // Update leaderboard preview
@@ -637,10 +639,18 @@ socket.on('show_results', (data) => {
         if (autoplayEnabled) {
             let countdown = AUTOPLAY_COUNTDOWN_SECONDS;
             elements.autoplayTimer.textContent = countdown;
+            
+            // Set message based on whether this is the last question
+            if (data.is_last_question) {
+                elements.autoplayMessage.textContent = '🎉 Ergebnisse in';
+            } else {
+                elements.autoplayMessage.textContent = 'Nächste Frage in';
+            }
+            
             elements.autoplayCountdown.style.display = 'block';
             
-            // Notify players about autoplay countdown
-            socket.emit('autoplay_started', { code: gameCode, seconds: countdown });
+            // Notify players about autoplay countdown (with is_last_question flag)
+            socket.emit('autoplay_started', { code: gameCode, seconds: countdown, is_last_question: data.is_last_question });
             
             autoplayCountdownInterval = setInterval(() => {
                 countdown--;
