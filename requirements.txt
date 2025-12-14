@@ -5,3 +5,4 @@ qrcode>=7.4
 pillow>=10.0.0,<11.0.0
 aiofiles>=23.0.0
 asgiref>=3.7.0
+typing_extensions>=4.12.2

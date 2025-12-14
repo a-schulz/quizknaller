@@ -4,13 +4,15 @@ Ein Multiplayer-Quiz das einschlägt!
 """
 
 import sys
-import os
 
-# Add site-packages to path (for bundled dependencies on Netcup)
-app_dir = os.path.dirname(os.path.abspath(__file__))
-site_packages = os.path.join(app_dir, 'site-packages')
-if os.path.exists(site_packages) and site_packages not in sys.path:
-    sys.path.insert(0, site_packages)
+# Workaround: drop known system injection paths that can shadow venv packages
+# Be conservative: only remove Nix paths that point to site-packages, keep stdlib entries.
+def _should_keep_path(p: str) -> bool:
+    if "/nix/store/" in p and "site-packages" in p:
+        return False
+    return True
+
+sys.path = [p for p in sys.path if _should_keep_path(p)]
 
 import asyncio
 import io
