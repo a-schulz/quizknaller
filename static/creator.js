@@ -5,6 +5,13 @@ const STORAGE_KEY = 'quizknaller_custom_quiz';
 // State
 let questions = [];
 
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // DOM Elements
 const quizTitleInput = document.getElementById('quiz-title');
 const questionCountDisplay = document.getElementById('question-count');
@@ -68,7 +75,7 @@ function renderQuestion(question, index) {
         
         <div class="form-group">
             <label>Frage *</label>
-            <textarea placeholder="Gib deine Frage ein..." data-field="question">${question.question}</textarea>
+            <textarea placeholder="Gib deine Frage ein..." data-field="question">${escapeHtml(question.question)}</textarea>
         </div>
         
         <div class="form-group">
@@ -81,7 +88,7 @@ function renderQuestion(question, index) {
                             data-field="correct">
                         <span class="answer-label">Antwort ${i + 1}:</span>
                         <input type="text" placeholder="Antwort eingeben..." 
-                            value="${answer}" data-field="answer-${i}">
+                            value="${escapeHtml(answer)}" data-field="answer-${i}">
                     </div>
                 `).join('')}
             </div>
@@ -305,6 +312,23 @@ function handleFileUpload(event) {
                 return;
             }
             
+            // Validate each question
+            for (let i = 0; i < quizData.questions.length; i++) {
+                const q = quizData.questions[i];
+                if (!q.question || 
+                    !Array.isArray(q.answers) || 
+                    q.answers.length !== 4 ||
+                    typeof q.correct !== 'number' ||
+                    q.correct < 0 || 
+                    q.correct > 3 ||
+                    typeof q.time_limit !== 'number' ||
+                    q.time_limit < 5 ||
+                    q.time_limit > 120) {
+                    showToast(`Ungültiges Format bei Frage ${i + 1}!`, 'error');
+                    return;
+                }
+            }
+            
             if (!confirm('Möchtest du dieses Quiz laden? Aktuelle Änderungen gehen verloren!')) {
                 return;
             }
@@ -327,10 +351,10 @@ function loadQuizData(quizData) {
     
     questions = quizData.questions.map((q, index) => ({
         id: Date.now() + index,
-        question: q.question,
-        answers: q.answers,
-        correct: q.correct,
-        time_limit: q.time_limit
+        question: String(q.question || ''),
+        answers: q.answers.map(a => String(a || '')),
+        correct: parseInt(q.correct) || 0,
+        time_limit: parseInt(q.time_limit) || 20
     }));
     
     updateUI();
