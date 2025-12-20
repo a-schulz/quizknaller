@@ -76,6 +76,29 @@
                         </div>
                     </div>
                 </details>
+                <!-- Mobile: auto-remove inactive users -->
+                <details class="team-config-panel team-config-mobile">
+                    <summary class="panel-header">
+                        <span class="panel-icon">🗑️</span>
+                        <span>Inaktive Spieler</span>
+                        <span class="panel-chevron">▼</span>
+                    </summary>
+                    <div class="panel-content">
+                        <label class="team-mode-toggle">
+                            <input type="checkbox" id="auto-remove-checkbox-mobile">
+                            <span>Inaktive Spieler automatisch entfernen</span>
+                        </label>
+                        <div id="auto-remove-settings-mobile" class="team-settings" style="display: none;">
+                            <div class="team-input-group">
+                                <label>Inaktivität nach X Fragen ohne Antwort:</label>
+                                <input type="number" id="inactivity-threshold-mobile" value="3" min="1" max="10">
+                            </div>
+                            <p style="font-size: 0.85em; color: #666; margin-top: 10px;">
+                                Spieler werden entfernt, wenn sie die angegebene Anzahl an aufeinanderfolgenden Fragen nicht beantworten.
+                            </p>
+                        </div>
+                    </div>
+                </details>
             </div>
             <div class="players-section">
                 <h3>Spieler (<span id="player-count">0</span>)</h3>
@@ -85,7 +108,7 @@
         <!-- Desktop: offcanvas team config -->
         <div class="team-config-offcanvas" id="team-config-offcanvas">
             <div class="offcanvas-header">
-                <h3>⚙️ Team-Einstellungen</h3>
+                <h3>⚙️ Einstellungen</h3>
                 <button class="offcanvas-close" id="team-config-close">✕</button>
             </div>
             <div class="offcanvas-content">
@@ -103,6 +126,20 @@
                         <input type="number" id="top-n-input" value="3" min="1" max="10">
                     </div>
                     <button id="save-teams-btn" class="btn-save-teams">Teams speichern</button>
+                </div>
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+                <label class="team-mode-toggle">
+                    <input type="checkbox" id="auto-remove-checkbox">
+                    <span>Inaktive Spieler automatisch entfernen</span>
+                </label>
+                <div id="auto-remove-settings" class="team-settings" style="display: none;">
+                    <div class="team-input-group">
+                        <label>Inaktivität nach X Fragen ohne Antwort:</label>
+                        <input type="number" id="inactivity-threshold" value="3" min="1" max="10">
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px;">
+                        Spieler werden entfernt, wenn sie die angegebene Anzahl an aufeinanderfolgenden Fragen nicht beantworten.
+                    </p>
                 </div>
             </div>
         </div>

@@ -46,6 +46,14 @@ const elements = {
     teamsInputMobile: document.getElementById('teams-input-mobile'),
     topNInputMobile: document.getElementById('top-n-input-mobile'),
     saveTeamsBtnMobile: document.getElementById('save-teams-btn-mobile'),
+    // Desktop auto-remove config elements
+    autoRemoveCheckbox: document.getElementById('auto-remove-checkbox'),
+    autoRemoveSettings: document.getElementById('auto-remove-settings'),
+    inactivityThreshold: document.getElementById('inactivity-threshold'),
+    // Mobile auto-remove config elements
+    autoRemoveCheckboxMobile: document.getElementById('auto-remove-checkbox-mobile'),
+    autoRemoveSettingsMobile: document.getElementById('auto-remove-settings-mobile'),
+    inactivityThresholdMobile: document.getElementById('inactivity-threshold-mobile'),
     // Offcanvas elements
     teamConfigToggle: document.getElementById('team-config-toggle'),
     teamConfigOffcanvas: document.getElementById('team-config-offcanvas'),
@@ -291,6 +299,81 @@ elements.saveTeamsBtnMobile.addEventListener('click', () => {
     
     socket.emit('configure_teams', {
         code: gameCode,
+        team_mode: true,
+        teams: teams,
+        top_n_players: topN
+    });
+    
+    alert('Team-Konfiguration gespeichert!');
+});
+
+// Desktop auto-remove checkbox
+elements.autoRemoveCheckbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        elements.autoRemoveSettings.style.display = 'block';
+        // Enable auto-remove with current threshold
+        const threshold = parseInt(elements.inactivityThreshold.value) || 3;
+        socket.emit('configure_auto_remove', {
+            code: gameCode,
+            auto_remove_inactive: true,
+            inactivity_threshold: threshold
+        });
+    } else {
+        elements.autoRemoveSettings.style.display = 'none';
+        // Disable auto-remove
+        socket.emit('configure_auto_remove', {
+            code: gameCode,
+            auto_remove_inactive: false,
+            inactivity_threshold: 3
+        });
+    }
+});
+
+// Mobile auto-remove checkbox
+elements.autoRemoveCheckboxMobile.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        elements.autoRemoveSettingsMobile.style.display = 'block';
+        // Enable auto-remove with current threshold
+        const threshold = parseInt(elements.inactivityThresholdMobile.value) || 3;
+        socket.emit('configure_auto_remove', {
+            code: gameCode,
+            auto_remove_inactive: true,
+            inactivity_threshold: threshold
+        });
+    } else {
+        elements.autoRemoveSettingsMobile.style.display = 'none';
+        // Disable auto-remove
+        socket.emit('configure_auto_remove', {
+            code: gameCode,
+            auto_remove_inactive: false,
+            inactivity_threshold: 3
+        });
+    }
+});
+
+// Update threshold when changed (desktop)
+elements.inactivityThreshold.addEventListener('change', (e) => {
+    if (elements.autoRemoveCheckbox.checked) {
+        const threshold = parseInt(e.target.value) || 3;
+        socket.emit('configure_auto_remove', {
+            code: gameCode,
+            auto_remove_inactive: true,
+            inactivity_threshold: threshold
+        });
+    }
+});
+
+// Update threshold when changed (mobile)
+elements.inactivityThresholdMobile.addEventListener('change', (e) => {
+    if (elements.autoRemoveCheckboxMobile.checked) {
+        const threshold = parseInt(e.target.value) || 3;
+        socket.emit('configure_auto_remove', {
+            code: gameCode,
+            auto_remove_inactive: true,
+            inactivity_threshold: threshold
+        });
+    }
+});
         team_mode: true,
         teams: teams,
         top_n_players: topN
@@ -783,4 +866,15 @@ function createConfetti() {
 
 socket.on('error', (data) => {
     alert(data.message);
+});
+
+socket.on('inactive_players_removed', (data) => {
+    const playerNames = data.players.join(', ');
+    const message = `${data.count} inaktive Spieler entfernt: ${playerNames}`;
+    
+    // Show a notification (could be improved with a nicer toast notification)
+    console.log(message);
+    
+    // You could also show a subtle toast message here instead of alert
+    // For now, we'll just log it to avoid disrupting the game flow
 });
