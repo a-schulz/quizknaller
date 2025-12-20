@@ -14,6 +14,7 @@ Ein Kahoot-ähnliches Quiz-Spiel mit einer mobil-optimierten Spieleransicht und 
 - 👥 **Team-Modus** - Spieler können in Teams gegeneinander antreten
 - 🏅 **Flexible Team-Wertung** - Host konfiguriert, wie viele Top-Spieler pro Team zählen
 - ▶️ **Autoplay-Modus** - Automatisches Durchlaufen der Fragen für nahtloses Spiel
+- 🗑️ **Auto-Remove Inactive Users** - Automatisches Entfernen inaktiver Spieler
 - 🎄 **Weihnachtsquiz** - Spezielles Quiz mit 15 Weihnachtsfragen
 - 🏆 **Podium & Konfetti** - Feierliches Spielende
 - 💾 **SQLite Persistenz** - Spieldaten werden in Datenbank gespeichert
@@ -58,9 +59,10 @@ Siehe [NETCUP_DEPLOYMENT.md](NETCUP_DEPLOYMENT.md) für Details.
 2. **Spieler:** Öffnen `http://localhost:8000` auf ihren Handys
 3. Wähle ein Quiz aus (z.B. das neue Weihnachtsquiz 🎄)
 4. **(Optional) Team-Modus:** Aktiviere den Team-Modus, konfiguriere Teams und lege fest, wie viele Top-Spieler pro Team zählen
-5. **(Optional) Autoplay:** Aktiviere "Automatisch zur nächsten Frage" für nahtloses Durchlaufen
-6. Spieler treten bei und wählen ggf. ihr Team aus
-7. Sobald alle beigetreten sind, starte das Spiel!
+5. **(Optional) Auto-Remove:** Aktiviere das automatische Entfernen inaktiver Spieler in den Einstellungen
+6. **(Optional) Autoplay:** Aktiviere "Automatisch zur nächsten Frage" für nahtloses Durchlaufen
+7. Spieler treten bei und wählen ggf. ihr Team aus
+8. Sobald alle beigetreten sind, starte das Spiel!
 
 ### Autoplay-Modus
 Der Host kann den Autoplay-Modus aktivieren:
@@ -76,6 +78,14 @@ Der Host kann den Team-Modus in der Lobby aktivieren und Teams konfigurieren:
 - Am Ende werden sowohl Team- als auch Einzelrankings angezeigt
 
 Siehe [TEAM_MODE_README.md](TEAM_MODE_README.md) für weitere Details.
+
+### Auto-Remove Inactive Users
+Der Host kann das automatische Entfernen inaktiver Spieler aktivieren:
+- Öffne die Einstellungen (⚙️ Teams/Einstellungen) in der Lobby
+- Aktiviere "Inaktive Spieler automatisch entfernen"
+- Lege fest, nach wie vielen Fragen ohne Antwort ein Spieler als inaktiv gilt (1-10 Fragen, Standard: 3)
+- Inaktive Spieler werden automatisch nach jeder Frage entfernt, wenn sie die konfigurierte Anzahl aufeinanderfolgender Fragen nicht beantwortet haben
+- Ideal, um Spieler zu entfernen, die die Verbindung verloren haben oder das Quiz-Tab offen gelassen haben
 
 ## Technologie-Stack
 

@@ -374,13 +374,6 @@ elements.inactivityThresholdMobile.addEventListener('change', (e) => {
         });
     }
 });
-        team_mode: true,
-        teams: teams,
-        top_n_players: topN
-    });
-    
-    alert('Team-Konfiguration gespeichert!');
-});
 
 elements.nextQuestionBtn.addEventListener('click', () => {
     if (autoplayTimeout) {
