@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizKnaller 💥 - Quiz Creator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/creator.css">
+</head>
+<body>
+    <div class="creator-container">
+        <div class="creator-header">
+            <div class="logo-section">
+                <h1 class="logo">Quiz<span>Creator</span></h1>
+                <p class="tagline">Erstelle dein eigenes Quiz! 🎨</p>
+            </div>
+            <div class="header-actions">
+                <a href="/host" class="btn-back">← Zurück zum Host</a>
+            </div>
+        </div>
+
+        <div class="creator-main">
+            <!-- Quiz Info Section -->
+            <div class="quiz-info-section card">
+                <h2>Quiz-Informationen</h2>
+                <div class="form-group">
+                    <label for="quiz-title">Quiz-Titel *</label>
+                    <input type="text" id="quiz-title" placeholder="z.B. Mein Wissens-Quiz 🎯" required>
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div class="questions-section card">
+                <div class="section-header">
+                    <h2>Fragen (<span id="question-count">0</span>)</h2>
+                    <button id="add-question-btn" class="btn-add">+ Frage hinzufügen</button>
+                </div>
+                <div id="questions-container" class="questions-container">
+                    <!-- Questions will be added here dynamically -->
+                </div>
+            </div>
+
+            <!-- Actions Section -->
+            <div class="actions-section card">
+                <h2>Aktionen</h2>
+                <div class="action-buttons">
+                    <div class="action-group">
+                        <h3>💾 Speichern & Laden</h3>
+                        <button id="save-local-btn" class="btn-action btn-primary">
+                            <span class="btn-icon">💾</span>
+                            <span>Im Browser speichern</span>
+                        </button>
+                        <button id="load-local-btn" class="btn-action btn-secondary">
+                            <span class="btn-icon">📂</span>
+                            <span>Aus Browser laden</span>
+                        </button>
+                    </div>
+                    <div class="action-group">
+                        <h3>📥 Import & Export</h3>
+                        <button id="download-btn" class="btn-action btn-primary">
+                            <span class="btn-icon">⬇️</span>
+                            <span>Als JSON herunterladen</span>
+                        </button>
+                        <label for="upload-input" class="btn-action btn-secondary">
+                            <span class="btn-icon">⬆️</span>
+                            <span>JSON hochladen</span>
+                        </label>
+                        <input type="file" id="upload-input" accept=".json" style="display: none;">
+                    </div>
+                    <div class="action-group">
+                        <h3>🗑️ Zurücksetzen</h3>
+                        <button id="clear-btn" class="btn-action btn-danger">
+                            <span class="btn-icon">🗑️</span>
+                            <span>Alles löschen</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="/static/creator.js"></script>
+</body>
+</html>

@@ -91,6 +91,12 @@ async def host():
     return FileResponse(static_path / "host.html")
 
 
+@app.get("/creator", response_class=HTMLResponse)
+async def creator():
+    """Serve the quiz creator interface."""
+    return FileResponse(static_path / "creator.html")
+
+
 @app.get("/api/qrcode")
 async def get_qrcode(request: Request, code: str):
     """Generate a QR code for the game join URL."""
