@@ -47,6 +47,7 @@ HOST_RECONNECT_GRACE_PERIOD = 60  # seconds to wait before ending game after hos
 READING_SPEED_WPM = 150  # words per minute for reading phase (lower = more time)
 MIN_READING_TIME = 2  # minimum seconds for reading phase
 MAX_READING_TIME = 8  # maximum seconds for reading phase
+DEFAULT_INACTIVITY_THRESHOLD = 3  # default number of questions without answer to be considered inactive
 
 # Load quiz data
 QUIZ_FILE = Path(__file__).parent / "quizzes.json"
@@ -170,6 +171,9 @@ def load_game_from_db(game_code: str) -> bool:
         "team_mode": game_data["team_mode"],
         "teams": game_data["teams"],
         "top_n_players": game_data["top_n_players"],
+        "auto_remove_inactive": False,  # Default to disabled on load
+        "inactivity_threshold": DEFAULT_INACTIVITY_THRESHOLD,
+        "answer_history": {},  # Track which questions each player answered
     }
     
     return True
@@ -376,6 +380,9 @@ async def create_game(sid, data):
         "team_mode": False,
         "teams": [],
         "top_n_players": 3,
+        "auto_remove_inactive": False,
+        "inactivity_threshold": DEFAULT_INACTIVITY_THRESHOLD,
+        "answer_history": {},  # Track which questions each player answered
     }
     
     await sio.enter_room(sid, game_code)
@@ -604,6 +611,11 @@ async def submit_answer(sid, data):
         "time": response_time,
     }
     
+    # Track answer history for inactive detection
+    if sid not in game["answer_history"]:
+        game["answer_history"][sid] = []
+    game["answer_history"][sid].append(game["current_question"])
+    
     # Record answer in database
     player = game["players"][sid]
     is_correct = answer_index == question["correct"]
@@ -664,6 +676,67 @@ async def time_up(sid, data):
         return
     
     await show_results(game_code)
+
+
+async def check_and_remove_inactive_players(game_code: str):
+    """Check for inactive players and remove them if auto-remove is enabled."""
+    if game_code not in games:
+        return
+    
+    game = games[game_code]
+    
+    # Only check if auto-remove is enabled
+    if not game.get("auto_remove_inactive", False):
+        return
+    
+    threshold = game.get("inactivity_threshold", DEFAULT_INACTIVITY_THRESHOLD)
+    current_question = game["current_question"]
+    
+    # Need at least threshold questions to detect inactivity
+    if current_question < threshold - 1:
+        return
+    
+    inactive_players = []
+    
+    for player_sid, player_data in list(game["players"].items()):
+        # Check answer history for this player
+        answer_history = game.get("answer_history", {}).get(player_sid, [])
+        
+        # Check if player has answered any of the last N questions
+        recent_questions = list(range(max(0, current_question - threshold + 1), current_question + 1))
+        has_recent_answer = any(q in answer_history for q in recent_questions)
+        
+        if not has_recent_answer:
+            inactive_players.append({
+                "sid": player_sid,
+                "name": player_data["name"]
+            })
+    
+    # Remove inactive players
+    if inactive_players:
+        for player_info in inactive_players:
+            player_sid = player_info["sid"]
+            player_name = player_info["name"]
+            
+            # Remove from game
+            if player_sid in game["players"]:
+                del game["players"][player_sid]
+            
+            # Remove from answer history
+            if player_sid in game.get("answer_history", {}):
+                del game["answer_history"][player_sid]
+            
+            # Remove from current answers if present
+            if player_sid in game.get("answers", {}):
+                del game["answers"][player_sid]
+            
+            print(f"Removed inactive player {player_name} from game {game_code}")
+        
+        # Notify host about removed players
+        await sio.emit("inactive_players_removed", {
+            "players": [p["name"] for p in inactive_players],
+            "count": len(inactive_players)
+        }, to=game["host_sid"])
 
 
 async def show_results(game_code: str):
@@ -764,6 +837,9 @@ async def show_results(game_code: str):
             "total_players": len(results),
             "is_last_question": is_last_question,
         }, to=result["sid"])
+    
+    # Check and remove inactive players if enabled
+    await check_and_remove_inactive_players(game_code)
 
 
 @sio.event
@@ -797,6 +873,37 @@ async def configure_teams(sid, data):
         "team_mode": team_mode,
         "teams": teams
     }, room=game_code)
+
+
+@sio.event
+async def configure_auto_remove(sid, data):
+    """Host configures auto-remove inactive users settings."""
+    game_code = data.get("code")
+    auto_remove_inactive = data.get("auto_remove_inactive", False)
+    inactivity_threshold = data.get("inactivity_threshold", DEFAULT_INACTIVITY_THRESHOLD)
+    
+    if game_code not in games:
+        return
+    
+    game = games[game_code]
+    
+    if game["host_sid"] != sid:
+        return
+    
+    if game["state"] != "lobby":
+        return
+    
+    # Validate threshold
+    if inactivity_threshold < 1:
+        inactivity_threshold = 1
+    elif inactivity_threshold > 10:
+        inactivity_threshold = 10
+    
+    game["auto_remove_inactive"] = auto_remove_inactive
+    game["inactivity_threshold"] = inactivity_threshold
+    
+    print(f"Auto-remove inactive configured for game {game_code}: enabled={auto_remove_inactive}, threshold={inactivity_threshold}")
+
 
 
 @sio.event
