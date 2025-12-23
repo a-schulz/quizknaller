@@ -409,20 +409,26 @@ async def create_custom_game(sid, data):
         return
     
     # Validate quiz structure
-    if not quiz.get("title") or not isinstance(quiz.get("questions"), list):
+    if (not quiz.get("title") or 
+        not isinstance(quiz.get("title"), str) or 
+        not quiz.get("title").strip() or 
+        not isinstance(quiz.get("questions"), list)):
         await sio.emit("error", {"message": "Ungültiges Quiz-Format"}, to=sid)
         return
     
     # Validate questions
-    for q in quiz["questions"]:
+    for i, q in enumerate(quiz["questions"]):
         if (not q.get("question") or 
+            not isinstance(q.get("question"), str) or
+            not q.get("question").strip() or
             not isinstance(q.get("answers"), list) or 
             len(q.get("answers", [])) != 4 or
+            not all(isinstance(a, str) and a.strip() for a in q.get("answers", [])) or
             not isinstance(q.get("correct"), int) or
             q.get("correct") < 0 or q.get("correct") > 3 or
             not isinstance(q.get("time_limit"), int) or
             q.get("time_limit") < 5 or q.get("time_limit") > 120):
-            await sio.emit("error", {"message": "Ungültiges Fragen-Format"}, to=sid)
+            await sio.emit("error", {"message": f"Ungültiges Fragen-Format bei Frage {i + 1}"}, to=sid)
             return
     
     game_code = generate_game_code()

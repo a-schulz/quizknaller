@@ -130,7 +130,7 @@ function saveCustomQuizzes(quizzes) {
 function addCustomQuiz(quizData) {
     const customQuizzes = getCustomQuizzes();
     const newQuiz = {
-        id: `custom_${Date.now()}`,
+        id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
         ...quizData,
         isCustom: true
     };
@@ -177,7 +177,7 @@ function createQuizCard(quiz, isCustom) {
     card.innerHTML = `
         <h3>${escapeHtml(quiz.title)}</h3>
         <span>${questionCount} Fragen</span>
-        ${isCustom ? '<button class="delete-quiz-btn" title="Quiz löschen">🗑️</button>' : ''}
+        ${isCustom ? '<button class="delete-quiz-btn" aria-label="Quiz löschen" title="Quiz löschen">🗑️</button>' : ''}
     `;
     
     // Add click handler for playing the quiz
@@ -221,6 +221,12 @@ function handleQuizUpload(event) {
         try {
             const data = JSON.parse(e.target.result);
             
+            // Check for null or undefined
+            if (data === null || data === undefined) {
+                alert('Die JSON-Datei enthält keine gültigen Daten!');
+                return;
+            }
+            
             // Check if it's an array (multiple quizzes) or single quiz
             let quizzes;
             if (Array.isArray(data)) {
@@ -237,8 +243,11 @@ function handleQuizUpload(event) {
             let addedCount = 0;
             for (const quizData of quizzes) {
                 // Validate structure
-                if (!quizData.title || !Array.isArray(quizData.questions)) {
-                    alert(`Ungültiges Quiz-Format in einem der Quizze!`);
+                if (!quizData.title || 
+                    typeof quizData.title !== 'string' || 
+                    quizData.title.trim() === '' || 
+                    !Array.isArray(quizData.questions)) {
+                    alert(`Ungültiges Quiz-Format: Titel fehlt oder ist leer!`);
                     continue;
                 }
                 
@@ -247,8 +256,11 @@ function handleQuizUpload(event) {
                 for (let i = 0; i < quizData.questions.length; i++) {
                     const q = quizData.questions[i];
                     if (!q.question || 
+                        typeof q.question !== 'string' ||
+                        q.question.trim() === '' ||
                         !Array.isArray(q.answers) || 
                         q.answers.length !== 4 ||
+                        !q.answers.every(a => typeof a === 'string' && a.trim() !== '') ||
                         typeof q.correct !== 'number' ||
                         q.correct < 0 || 
                         q.correct > 3 ||
