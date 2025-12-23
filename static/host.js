@@ -3,6 +3,7 @@ const socket = io();
 
 // Configuration
 const AUTOPLAY_COUNTDOWN_SECONDS = 10;
+const CUSTOM_QUIZZES_STORAGE_KEY = 'quizknaller_custom_quizzes';
 
 let gameCode = null;
 let correctIndex = null;
@@ -25,6 +26,8 @@ const screens = {
 
 const elements = {
     quizList: document.getElementById('quiz-list'),
+    uploadQuizBtn: document.getElementById('upload-quiz-btn'),
+    uploadQuizInput: document.getElementById('upload-quiz-input'),
     lobbyQuizTitle: document.getElementById('lobby-quiz-title'),
     joinUrl: document.getElementById('join-url'),
     gameCodeDisplay: document.getElementById('game-code-display'),
@@ -97,25 +100,192 @@ function updateHeaderGameCodes(code) {
     });
 }
 
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Custom quiz management
+function getCustomQuizzes() {
+    try {
+        const data = localStorage.getItem(CUSTOM_QUIZZES_STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        console.error('Error loading custom quizzes:', e);
+        return [];
+    }
+}
+
+function saveCustomQuizzes(quizzes) {
+    try {
+        localStorage.setItem(CUSTOM_QUIZZES_STORAGE_KEY, JSON.stringify(quizzes));
+    } catch (e) {
+        console.error('Error saving custom quizzes:', e);
+        alert('Fehler beim Speichern der Quizze: ' + e.message);
+    }
+}
+
+function addCustomQuiz(quizData) {
+    const customQuizzes = getCustomQuizzes();
+    const newQuiz = {
+        id: `custom_${Date.now()}`,
+        ...quizData,
+        isCustom: true
+    };
+    customQuizzes.push(newQuiz);
+    saveCustomQuizzes(customQuizzes);
+    return newQuiz;
+}
+
+function deleteCustomQuiz(quizId) {
+    const customQuizzes = getCustomQuizzes();
+    const filtered = customQuizzes.filter(q => q.id !== quizId);
+    saveCustomQuizzes(filtered);
+}
+
 // Load quizzes
 async function loadQuizzes() {
     const response = await fetch('/api/quizzes');
-    const quizzes = await response.json();
+    const defaultQuizzes = await response.json();
+    const customQuizzes = getCustomQuizzes();
     
     elements.quizList.innerHTML = '';
-    quizzes.forEach(quiz => {
-        const card = document.createElement('div');
-        card.className = 'quiz-card';
-        card.innerHTML = `
-            <h3>${quiz.title}</h3>
-            <span>${quiz.questionCount} Fragen</span>
-        `;
-        card.addEventListener('click', () => {
-            socket.emit('create_game', { quiz_id: quiz.id });
-        });
+    
+    // Add default quizzes
+    defaultQuizzes.forEach(quiz => {
+        const card = createQuizCard(quiz, false);
+        elements.quizList.appendChild(card);
+    });
+    
+    // Add custom quizzes
+    customQuizzes.forEach(quiz => {
+        const card = createQuizCard(quiz, true);
         elements.quizList.appendChild(card);
     });
 }
+
+function createQuizCard(quiz, isCustom) {
+    const card = document.createElement('div');
+    card.className = isCustom ? 'quiz-card custom-quiz' : 'quiz-card';
+    
+    const questionCount = isCustom 
+        ? quiz.questions.length 
+        : quiz.questionCount;
+    
+    card.innerHTML = `
+        <h3>${escapeHtml(quiz.title)}</h3>
+        <span>${questionCount} Fragen</span>
+        ${isCustom ? '<button class="delete-quiz-btn" title="Quiz löschen">🗑️</button>' : ''}
+    `;
+    
+    // Add click handler for playing the quiz
+    const cardClickArea = card;
+    cardClickArea.addEventListener('click', (e) => {
+        // Don't trigger if clicking delete button
+        if (e.target.classList.contains('delete-quiz-btn')) {
+            return;
+        }
+        
+        if (isCustom) {
+            // Create game with custom quiz data
+            socket.emit('create_custom_game', { quiz: quiz });
+        } else {
+            socket.emit('create_game', { quiz_id: quiz.id });
+        }
+    });
+    
+    // Add delete handler for custom quizzes
+    if (isCustom) {
+        const deleteBtn = card.querySelector('.delete-quiz-btn');
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm(`Möchtest du das Quiz "${quiz.title}" wirklich löschen?`)) {
+                deleteCustomQuiz(quiz.id);
+                loadQuizzes();
+            }
+        });
+    }
+    
+    return card;
+}
+
+// Handle file upload
+function handleQuizUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            // Check if it's an array (multiple quizzes) or single quiz
+            let quizzes;
+            if (Array.isArray(data)) {
+                if (data.length === 0) {
+                    alert('Die JSON-Datei enthält keine Quizze!');
+                    return;
+                }
+                quizzes = data;
+            } else {
+                quizzes = [data];
+            }
+            
+            // Validate and add each quiz
+            let addedCount = 0;
+            for (const quizData of quizzes) {
+                // Validate structure
+                if (!quizData.title || !Array.isArray(quizData.questions)) {
+                    alert(`Ungültiges Quiz-Format in einem der Quizze!`);
+                    continue;
+                }
+                
+                // Validate each question
+                let valid = true;
+                for (let i = 0; i < quizData.questions.length; i++) {
+                    const q = quizData.questions[i];
+                    if (!q.question || 
+                        !Array.isArray(q.answers) || 
+                        q.answers.length !== 4 ||
+                        typeof q.correct !== 'number' ||
+                        q.correct < 0 || 
+                        q.correct > 3 ||
+                        typeof q.time_limit !== 'number' ||
+                        q.time_limit < 5 ||
+                        q.time_limit > 120) {
+                        alert(`Ungültiges Format bei Frage ${i + 1} in Quiz "${quizData.title}"!`);
+                        valid = false;
+                        break;
+                    }
+                }
+                
+                if (valid) {
+                    addCustomQuiz(quizData);
+                    addedCount++;
+                }
+            }
+            
+            if (addedCount > 0) {
+                alert(`${addedCount} Quiz(ze) erfolgreich hochgeladen! ⬆️`);
+                loadQuizzes();
+            }
+        } catch (e) {
+            alert('Fehler beim Lesen der Datei: ' + e.message);
+        }
+    };
+    
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+}
+
+// Initialize upload handler
+elements.uploadQuizBtn.addEventListener('click', () => {
+    elements.uploadQuizInput.click();
+});
+
+elements.uploadQuizInput.addEventListener('change', handleQuizUpload);
 
 // Initialize
 loadQuizzes();
