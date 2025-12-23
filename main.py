@@ -48,6 +48,8 @@ READING_SPEED_WPM = 150  # words per minute for reading phase (lower = more time
 MIN_READING_TIME = 2  # minimum seconds for reading phase
 MAX_READING_TIME = 8  # maximum seconds for reading phase
 DEFAULT_INACTIVITY_THRESHOLD = 3  # default number of questions without answer to be considered inactive
+MIN_TIME_LIMIT = 5  # minimum time limit for questions in seconds
+MAX_TIME_LIMIT = 120  # maximum time limit for questions in seconds
 
 # Load quiz data
 QUIZ_FILE = Path(__file__).parent / "quizzes.json"
@@ -427,7 +429,7 @@ async def create_custom_game(sid, data):
             not isinstance(q.get("correct"), int) or
             q.get("correct") < 0 or q.get("correct") > 3 or
             not isinstance(q.get("time_limit"), int) or
-            q.get("time_limit") < 5 or q.get("time_limit") > 120):
+            q.get("time_limit") < MIN_TIME_LIMIT or q.get("time_limit") > MAX_TIME_LIMIT):
             await sio.emit("error", {"message": f"Ungültiges Fragen-Format bei Frage {i + 1}"}, to=sid)
             return
     

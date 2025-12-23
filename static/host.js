@@ -4,6 +4,9 @@ const socket = io();
 // Configuration
 const AUTOPLAY_COUNTDOWN_SECONDS = 10;
 const CUSTOM_QUIZZES_STORAGE_KEY = 'quizknaller_custom_quizzes';
+const MIN_TIME_LIMIT = 5;  // minimum time limit for questions in seconds
+const MAX_TIME_LIMIT = 120;  // maximum time limit for questions in seconds
+const ID_RANDOM_LENGTH = 9;  // length of random string in ID generation
 
 let gameCode = null;
 let correctIndex = null;
@@ -130,7 +133,7 @@ function saveCustomQuizzes(quizzes) {
 function addCustomQuiz(quizData) {
     const customQuizzes = getCustomQuizzes();
     const newQuiz = {
-        id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 2 + ID_RANDOM_LENGTH)}`,
         ...quizData,
         isCustom: true
     };
@@ -265,8 +268,8 @@ function handleQuizUpload(event) {
                         q.correct < 0 || 
                         q.correct > 3 ||
                         typeof q.time_limit !== 'number' ||
-                        q.time_limit < 5 ||
-                        q.time_limit > 120) {
+                        q.time_limit < MIN_TIME_LIMIT ||
+                        q.time_limit > MAX_TIME_LIMIT) {
                         alert(`Ungültiges Format bei Frage ${i + 1} in Quiz "${quizData.title}"!`);
                         valid = false;
                         break;
