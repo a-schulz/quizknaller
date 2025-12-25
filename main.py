@@ -48,6 +48,8 @@ READING_SPEED_WPM = 150  # words per minute for reading phase (lower = more time
 MIN_READING_TIME = 2  # minimum seconds for reading phase
 MAX_READING_TIME = 8  # maximum seconds for reading phase
 DEFAULT_INACTIVITY_THRESHOLD = 3  # default number of questions without answer to be considered inactive
+MIN_TIME_LIMIT = 5  # minimum time limit for questions in seconds
+MAX_TIME_LIMIT = 120  # maximum time limit for questions in seconds
 
 # Load quiz data
 QUIZ_FILE = Path(__file__).parent / "quizzes.json"
@@ -389,6 +391,67 @@ async def create_game(sid, data):
         "auto_remove_inactive": False,
         "inactivity_threshold": DEFAULT_INACTIVITY_THRESHOLD,
         "answer_history": {},  # Track which questions each player answered
+    }
+    
+    await sio.enter_room(sid, game_code)
+    await sio.emit("game_created", {
+        "code": game_code,
+        "quiz_title": quiz["title"],
+        "question_count": len(quiz["questions"])
+    }, to=sid)
+
+
+@sio.event
+async def create_custom_game(sid, data):
+    """Host creates a new game with a custom quiz."""
+    quiz = data.get("quiz")
+    
+    if not quiz:
+        await sio.emit("error", {"message": "Quiz-Daten fehlen"}, to=sid)
+        return
+    
+    # Validate quiz structure
+    if (not quiz.get("title") or 
+        not isinstance(quiz.get("title"), str) or 
+        not quiz.get("title").strip() or 
+        not isinstance(quiz.get("questions"), list)):
+        await sio.emit("error", {"message": "Ungültiges Quiz-Format"}, to=sid)
+        return
+    
+    # Validate questions
+    for i, q in enumerate(quiz["questions"]):
+        if (not q.get("question") or 
+            not isinstance(q.get("question"), str) or
+            not q.get("question").strip() or
+            not isinstance(q.get("answers"), list) or 
+            len(q.get("answers", [])) != 4 or
+            not all(isinstance(a, str) and a.strip() for a in q.get("answers", [])) or
+            not isinstance(q.get("correct"), int) or
+            q.get("correct") < 0 or q.get("correct") > 3 or
+            not isinstance(q.get("time_limit"), int) or
+            q.get("time_limit") < MIN_TIME_LIMIT or q.get("time_limit") > MAX_TIME_LIMIT):
+            await sio.emit("error", {"message": f"Ungültiges Fragen-Format bei Frage {i + 1}"}, to=sid)
+            return
+    
+    game_code = generate_game_code()
+    
+    # Create in database
+    db.create_game(game_code, sid, quiz["title"], quiz)
+    
+    games[game_code] = {
+        "host_sid": sid,
+        "quiz": quiz,
+        "players": {},
+        "current_question": -1,
+        "state": "lobby",
+        "answers": {},
+        "question_start_time": None,
+        "team_mode": False,
+        "teams": [],
+        "top_n_players": 3,
+        "auto_remove_inactive": False,
+        "inactivity_threshold": DEFAULT_INACTIVITY_THRESHOLD,
+        "answer_history": {},
     }
     
     await sio.enter_room(sid, game_code)
