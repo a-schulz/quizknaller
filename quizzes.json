@@ -2075,5 +2075,1025 @@
         "time_limit": 15
       }
     ]
+  },
+  {
+    "title": "Allgemeinwissen 2.0 🧠",
+    "questions": [
+      {
+        "question": "Welches ist das bevölkerungsreichste Land der Welt?",
+        "answers": [
+          "China",
+          "Indien",
+          "USA",
+          "Indonesien"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Wie viele Knochen hat ein erwachsener Mensch?",
+        "answers": [
+          "186",
+          "196",
+          "206",
+          "226"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches chemische Symbol steht für Gold?",
+        "answers": [
+          "Go",
+          "Gl",
+          "Ag",
+          "Au"
+        ],
+        "correct": 3,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Jahr fiel die Berliner Mauer?",
+        "answers": [
+          "1987",
+          "1988",
+          "1989",
+          "1990"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist die Hauptstadt von Australien?",
+        "answers": [
+          "Sydney",
+          "Melbourne",
+          "Brisbane",
+          "Canberra"
+        ],
+        "correct": 3,
+        "time_limit": 20
+      },
+      {
+        "question": "Wie viele Planeten hat unser Sonnensystem?",
+        "answers": [
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches Tier ist das schnellste Landtier der Welt?",
+        "answers": [
+          "Gepard",
+          "Löwe",
+          "Gazelle",
+          "Greyhound"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie heißt die Währung Japans?",
+        "answers": [
+          "Won",
+          "Yuan",
+          "Yen",
+          "Ringgit"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Kontinent hat die meisten Länder?",
+        "answers": [
+          "Asien",
+          "Amerika",
+          "Afrika",
+          "Europa"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Wer schrieb das Werk „Faust“?",
+        "answers": [
+          "Friedrich Schiller",
+          "Johann Wolfgang von Goethe",
+          "Heinrich Heine",
+          "Bertolt Brecht"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches chemische Element hat die Ordnungszahl 1?",
+        "answers": [
+          "Helium",
+          "Sauerstoff",
+          "Kohlenstoff",
+          "Wasserstoff"
+        ],
+        "correct": 3,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Jahr versank die Titanic?",
+        "answers": [
+          "1908",
+          "1910",
+          "1912",
+          "1914"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches ist das kleinste Land der Welt?",
+        "answers": [
+          "Monaco",
+          "Liechtenstein",
+          "San Marino",
+          "Vatikan"
+        ],
+        "correct": 3,
+        "time_limit": 20
+      },
+      {
+        "question": "Was bedeutet das Kürzel „DNA“?",
+        "answers": [
+          "Deoxyribonukleinsäure",
+          "Doppel-Nuclein-Amid",
+          "Di-Nuclein-Amin",
+          "Dynamic Nuclein Acid"
+        ],
+        "correct": 0,
+        "time_limit": 20
+      },
+      {
+        "question": "Welche Farbe entsteht, wenn man Blau und Gelb mischt?",
+        "answers": [
+          "Orange",
+          "Grün",
+          "Lila",
+          "Braun"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      }
+    ]
+  },
+  {
+    "title": "Biermarken Quiz 🍺",
+    "questions": [
+      {
+        "question": "Welche Biermarke wirbt mit dem Slogan „Probably the best beer in the world“?",
+        "answers": [
+          "Heineken",
+          "Carlsberg",
+          "Budweiser",
+          "Corona"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Aus welchem Land stammt das Bier Guinness?",
+        "answers": [
+          "England",
+          "Schottland",
+          "Irland",
+          "Wales"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Was besagt das deutsche Reinheitsgebot für Bier?",
+        "answers": [
+          "Bier darf nur in Deutschland gebraut werden",
+          "Bier muss nur Wasser, Malz, Hopfen und Hefe enthalten",
+          "Bier muss mindestens 3 % Alkohol haben",
+          "Bier darf nicht wärmer als 8 °C serviert werden"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Welche Biersorte ist typisch für Köln?",
+        "answers": [
+          "Altbier",
+          "Kölsch",
+          "Pils",
+          "Weizen"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Biersorte ist typisch für Düsseldorf?",
+        "answers": [
+          "Altbier",
+          "Kölsch",
+          "Pils",
+          "Export"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie viel Prozent Alkohol hat ein typisches deutsches Lagerbier?",
+        "answers": [
+          "2–3 %",
+          "4–5 %",
+          "6–7 %",
+          "8–9 %"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Biermarke kommt aus Mexiko?",
+        "answers": [
+          "Stella Artois",
+          "Corona",
+          "Peroni",
+          "Asahi"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist ein „Radler“?",
+        "answers": [
+          "Ein alkoholfreies Bier",
+          "Bier gemischt mit Limonade oder Zitronenlimonade",
+          "Ein dunkles Weizenbier",
+          "Ein belgisches Trappistenbier"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Aus welchem Land stammt Stella Artois?",
+        "answers": [
+          "Frankreich",
+          "Belgien",
+          "Niederlande",
+          "Luxemburg"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Münchner Brauerei ist eine der ältesten der Stadt?",
+        "answers": [
+          "Paulaner",
+          "Augustiner",
+          "Löwenbräu",
+          "Hofbräu"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Wofür steht das Kürzel IPA beim Bier?",
+        "answers": [
+          "India Pale Ale",
+          "International Premium Ale",
+          "Irish Pilsner Authentic",
+          "Imperial Pure Ale"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Was versteht man unter einem „Stout“?",
+        "answers": [
+          "Einem hellen, leichten Bier",
+          "Einem dunklen, kräftigen Bier",
+          "Einem ungefilterten Weizenbier",
+          "Einem alkoholfreien Bier"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches Land ist bekannt für Trappistenbiere wie Chimay und Orval?",
+        "answers": [
+          "Deutschland",
+          "Belgien",
+          "Niederlande",
+          "Österreich"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Biermarke ist der weltweite Marktführer nach Absatzmenge?",
+        "answers": [
+          "Budweiser",
+          "Heineken",
+          "Snow (雪花)",
+          "Corona"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Wie nennt man das traditionelle bayrische Bierfest in München?",
+        "answers": [
+          "Cannstatter Wasen",
+          "Oktoberfest",
+          "Volksfest",
+          "Biergipfel"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      }
+    ]
+  },
+  {
+    "title": "Getränke Quiz 🧃",
+    "questions": [
+      {
+        "question": "Woraus wird Whisky hauptsächlich hergestellt?",
+        "answers": [
+          "Trauben",
+          "Getreide/Malz",
+          "Zuckerrohr",
+          "Agave"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie heißt der klassische Cocktail aus Rum, Limettensaft und Minze?",
+        "answers": [
+          "Daiquiri",
+          "Caipirinha",
+          "Mojito",
+          "Cuba Libre"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Aus welcher Pflanze wird Tequila hergestellt?",
+        "answers": [
+          "Kaktus",
+          "Agave",
+          "Zuckerrohr",
+          "Kokosnuss"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist „Prosecco“?",
+        "answers": [
+          "Ein deutsches Sektgetränk",
+          "Ein italienischer Schaumwein",
+          "Ein französischer Champagner",
+          "Ein spanischer Cava"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie wird ein Aperol Spritz klassisch zubereitet?",
+        "answers": [
+          "Aperol + Wodka + Zitrone",
+          "Aperol + Prosecco + Sodawasser",
+          "Aperol + Gin + Tonic",
+          "Aperol + Campari + Orange"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist Sake?",
+        "answers": [
+          "Japanischer Reiswein",
+          "Koreanischer Soju",
+          "Chinesischer Reisbrand",
+          "Mongolisches Stutenmilchgetränk"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Was bedeutet „Virgin“ bei einem Cocktail?",
+        "answers": [
+          "Alkoholfrei",
+          "Besonders stark",
+          "Mit Eis serviert",
+          "Handgemixt"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist „Kombucha“?",
+        "answers": [
+          "Ein japanisches Reisgetränk",
+          "Ein fermentierter Tee",
+          "Eine südamerikanische Limonade",
+          "Ein indisches Gewürzgetränk"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches Land ist bekannt für die Herstellung von Champagner?",
+        "answers": [
+          "Italien",
+          "Spanien",
+          "Frankreich",
+          "Deutschland"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Was enthält eine klassische „Bloody Mary“?",
+        "answers": [
+          "Vodka und Tomatensaft",
+          "Rum und Cola",
+          "Gin und Tonic",
+          "Whisky und Ginger Ale"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches Getränk ist ein Klassiker der deutschen Weihnachtszeit?",
+        "answers": [
+          "Eggnog",
+          "Glühwein",
+          "Punch",
+          "Grog"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Welche Farbe hat Absinthe in seiner natürlichen Form?",
+        "answers": [
+          "Rot",
+          "Gelb",
+          "Grün",
+          "Blau"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Welcher Cocktail besteht aus Wodka, Triple Sec, Cranberry-Saft und Limettensaft?",
+        "answers": [
+          "Manhattan",
+          "Cosmopolitan",
+          "Margarita",
+          "Negroni"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Was ist „Cold Brew Coffee“?",
+        "answers": [
+          "Kaffee der schnell im Eisschrank abgekühlt wird",
+          "Kaffee der über Stunden mit kaltem Wasser extrahiert wird",
+          "Gefrorener Kaffee-Slush",
+          "Espresso mit Eiswürfeln"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Aus welchen zwei Zutaten besteht ein klassischer Gin Tonic?",
+        "answers": [
+          "Gin + Soda",
+          "Gin + Tonic Water",
+          "Gin + Zitronensaft",
+          "Gin + Sodawasser + Limette"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      }
+    ]
+  },
+  {
+    "title": "Sport Quiz ⚽",
+    "questions": [
+      {
+        "question": "Welches Land hat die meisten FIFA-Weltmeistertitel gewonnen?",
+        "answers": [
+          "Deutschland",
+          "Argentinien",
+          "Brasilien",
+          "Italien"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie viele Spieler hat eine Fußballmannschaft auf dem Spielfeld?",
+        "answers": [
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "In welcher Stadt fanden die Olympischen Sommerspiele 2024 statt?",
+        "answers": [
+          "Los Angeles",
+          "Paris",
+          "London",
+          "Tokio"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie oft wurde die deutsche Fußballnationalmannschaft Weltmeister?",
+        "answers": [
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Sport gibt es die „Tour de France“?",
+        "answers": [
+          "Marathonlauf",
+          "Triathlon",
+          "Radsport",
+          "Motorsport"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Wie viele Punkte bekommt man in Basketball für einen Drei-Punkte-Wurf?",
+        "answers": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Welches Land veranstaltete die FIFA-WM 2006?",
+        "answers": [
+          "Brasilien",
+          "Frankreich",
+          "Deutschland",
+          "Spanien"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie nennt man einen Bowlingwurf, bei dem alle 10 Pins auf Anhieb fallen?",
+        "answers": [
+          "Spare",
+          "Strike",
+          "Perfect",
+          "Birdie"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "In welchem Sport gibt es den Begriff „Birdie“?",
+        "answers": [
+          "Tennis",
+          "Golf",
+          "Baseball",
+          "Cricket"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie viele Spieler stehen beim American Football pro Team auf dem Feld?",
+        "answers": [
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Tennisspieler hat die meisten Grand-Slam-Titel der Herren gewonnen?",
+        "answers": [
+          "Roger Federer",
+          "Rafael Nadal",
+          "Novak Djokovic",
+          "Andy Murray"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "In welchem Land wurde die Kampfsportart Sumo entwickelt?",
+        "answers": [
+          "China",
+          "Korea",
+          "Japan",
+          "Mongolei"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Verein hat die meisten Champions-League-Titel gewonnen?",
+        "answers": [
+          "FC Barcelona",
+          "FC Bayern München",
+          "Real Madrid",
+          "AC Mailand"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie nennt man beim Volleyball den direkten Punktgewinn durch den Aufschlag?",
+        "answers": [
+          "Ace",
+          "Strike",
+          "Smash",
+          "Slam"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie viele Goldmedaillen gewann Deutschland bei den Olympischen Spielen 2024 in Paris?",
+        "answers": [
+          "8",
+          "10",
+          "12",
+          "14"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      }
+    ]
+  },
+  {
+    "title": "Essen & Kochen 🍕",
+    "questions": [
+      {
+        "question": "Welche Zutaten gehören zur klassischen Carbonara (ohne Sahne)?",
+        "answers": [
+          "Spaghetti, Sahne, Speck, Parmesan",
+          "Spaghetti, Eigelb, Guanciale, Pecorino",
+          "Spaghetti, Tomatensauce, Mozzarella",
+          "Spaghetti, Olivenöl, Knoblauch, Chili"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Welches Land ist die Heimat des Wiener Schnitzels?",
+        "answers": [
+          "Deutschland",
+          "Schweiz",
+          "Österreich",
+          "Ungarn"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist „Hummus“?",
+        "answers": [
+          "Ein griechisches Joghurtgericht",
+          "Ein Aufstrich aus Kichererbsen",
+          "Ein türkisches Lammgericht",
+          "Ein persisches Reisrezept"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie nennt man die spanische Reispfanne mit Meeresfrüchten und Gemüse?",
+        "answers": [
+          "Paella",
+          "Risotto",
+          "Biryani",
+          "Jambalaya"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Käse aus der Schweiz ist bekannt für seine Löcher?",
+        "answers": [
+          "Gouda",
+          "Camembert",
+          "Emmentaler",
+          "Parmesan"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Was ist „Guacamole“?",
+        "answers": [
+          "Eine mexikanische Avocado-Sauce",
+          "Ein brasilianisches Fleischgericht",
+          "Eine peruanische Suppe",
+          "Ein kolumbianisches Dessert"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist „Kimchi“?",
+        "answers": [
+          "Japanisches fermentiertes Gemüse",
+          "Koreanisches fermentiertes Gemüse (meist Kohl)",
+          "Chinesisches Sauergemüse",
+          "Thailändische Würzpaste"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Welche Zutat lässt Brotteig aufgehen?",
+        "answers": [
+          "Salz",
+          "Zucker",
+          "Hefe",
+          "Butter"
+        ],
+        "correct": 2,
+        "time_limit": 10
+      },
+      {
+        "question": "Was ist „Ratatouille“?",
+        "answers": [
+          "Ein französisches Gemüsegericht aus der Provence",
+          "Ein italienischer Nudelauflauf",
+          "Ein griechischer Lammeintopf",
+          "Ein spanisches Tapas-Gericht"
+        ],
+        "correct": 0,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Kerntemperatur gilt für ein „Medium Rare“ Steak?",
+        "answers": [
+          "45–50 °C",
+          "55–60 °C",
+          "65–70 °C",
+          "75–80 °C"
+        ],
+        "correct": 1,
+        "time_limit": 20
+      },
+      {
+        "question": "Was ist „Sushi“ im ursprünglichen Sinne?",
+        "answers": [
+          "Rohes Fischfilet auf Reis",
+          "Japanisches Gericht mit gewürztem Essigreis",
+          "Chinesisches Nudelgericht",
+          "Koreanisches Reisgebäck"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Aus welchem Land stammt „Bouillabaisse“?",
+        "answers": [
+          "Spanien",
+          "Portugal",
+          "Frankreich",
+          "Griechenland"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Hülsenfrucht ist Hauptzutat von Falafel?",
+        "answers": [
+          "Linsen",
+          "Erbsen",
+          "Kichererbsen",
+          "Bohnen"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Was ist „Pulled Pork“?",
+        "answers": [
+          "Gebratenes Schweinefilet",
+          "Langsam gegartes und gezupftes Schweinefleisch",
+          "Marinierter Schweinebauch",
+          "Geräucherte Schweinerippen"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welches Gewürz gibt Curry seine typisch gelbe Farbe?",
+        "answers": [
+          "Paprika",
+          "Safran",
+          "Kurkuma",
+          "Ingwer"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      }
+    ]
+  },
+  {
+    "title": "Filme & Serien 🎬",
+    "questions": [
+      {
+        "question": "In welchem Jahr erschien der erste „Star Wars“-Film?",
+        "answers": [
+          "1975",
+          "1977",
+          "1979",
+          "1981"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Film gewann den Oscar als bester Film 2020?",
+        "answers": [
+          "1917",
+          "Joker",
+          "Parasite",
+          "Ford v Ferrari"
+        ],
+        "correct": 2,
+        "time_limit": 20
+      },
+      {
+        "question": "Wer spielt die Rolle des Iron Man im Marvel Cinematic Universe?",
+        "answers": [
+          "Chris Evans",
+          "Robert Downey Jr.",
+          "Chris Hemsworth",
+          "Mark Ruffalo"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie viele Staffeln hat die Serie „Breaking Bad“?",
+        "answers": [
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche Streaming-Plattform produzierte „Stranger Things“?",
+        "answers": [
+          "Amazon Prime",
+          "Disney+",
+          "Netflix",
+          "HBO Max"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wer regissierte den Film „Schindlers Liste“?",
+        "answers": [
+          "Martin Scorsese",
+          "Francis Ford Coppola",
+          "Steven Spielberg",
+          "James Cameron"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Schauspieler spielt Jack Dawson im Film „Titanic“ (1997)?",
+        "answers": [
+          "Brad Pitt",
+          "Johnny Depp",
+          "Leonardo DiCaprio",
+          "Matt Damon"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Fantasyland spielt der Film „Der Herr der Ringe“?",
+        "answers": [
+          "Westeros",
+          "Mittelerde",
+          "Narnia",
+          "Arendelle"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "Wie heißt der Hai-Film von Steven Spielberg aus dem Jahr 1975?",
+        "answers": [
+          "Shark",
+          "Jaws",
+          "Deep Blue",
+          "The Deep"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Welche deutsche Serie handelt von Zeitreisen in der Stadt Winden?",
+        "answers": [
+          "How to Sell Drugs Online (Fast)",
+          "Dark",
+          "Babylon Berlin",
+          "4 Blocks"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "In welchem Film hört man die berühmte Zeile: „Ich bin dein Vater“?",
+        "answers": [
+          "Star Wars: Eine neue Hoffnung",
+          "Star Wars: Das Imperium schlägt zurück",
+          "Star Wars: Die Rückkehr der Jedi-Ritter",
+          "Star Wars: Die Rache der Sith"
+        ],
+        "correct": 1,
+        "time_limit": 15
+      },
+      {
+        "question": "Wer sang den Titelsong des Bond-Films „Skyfall“?",
+        "answers": [
+          "Shirley Bassey",
+          "Sam Smith",
+          "Adele",
+          "Billie Eilish"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Wie heißt der Dinosaurier-Vergnügungspark aus dem gleichnamigen Film von 1993?",
+        "answers": [
+          "Dino World",
+          "Jurassic Park",
+          "Prehistoric Park",
+          "Crichton Island"
+        ],
+        "correct": 1,
+        "time_limit": 10
+      },
+      {
+        "question": "In welchem Jahr erschien der erste Teil der „Matrix“-Trilogie?",
+        "answers": [
+          "1997",
+          "1998",
+          "1999",
+          "2000"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      },
+      {
+        "question": "Welcher Schauspieler spielt den Joker im gleichnamigen Film von 2019?",
+        "answers": [
+          "Heath Ledger",
+          "Jack Nicholson",
+          "Joaquin Phoenix",
+          "Jared Leto"
+        ],
+        "correct": 2,
+        "time_limit": 15
+      }
+    ]
   }
 ]
