@@ -255,7 +255,6 @@ socket.on('joined_game', (data) => {
 });
 
 socket.on('quiz_switched', (data) => {
-    gameCode = data.code;
     localStorage.setItem('playerGameCode', data.code);
     localStorage.setItem('playerQuizTitle', data.quiz_title);
 

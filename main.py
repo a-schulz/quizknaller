@@ -462,6 +462,35 @@ async def create_custom_game(sid, data):
     }, to=sid)
 
 
+def apply_quiz_switch(game_code: str, quiz: dict) -> list[dict]:
+    """Apply quiz switch while keeping the same game session and players."""
+    game = games[game_code]
+
+    game["quiz"] = quiz
+    game["current_question"] = -1
+    game["state"] = "lobby"
+    game["answers"] = {}
+    game["question_start_time"] = None
+    game["answer_history"] = {}
+
+    for player in game["players"].values():
+        player["score"] = 0
+        player["streak"] = 0
+        if not game["team_mode"]:
+            player["team"] = None
+
+    db.update_game(
+        game_code,
+        quiz_name=quiz["title"],
+        quiz=quiz,
+        current_question=-1,
+        state="lobby",
+    )
+    db.reset_game_progress(game_code, reset_teams=not game["team_mode"])
+
+    return [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+
+
 @sio.event
 async def switch_game_quiz(sid, data):
     """Host switches the quiz within an existing game session."""
@@ -487,29 +516,7 @@ async def switch_game_quiz(sid, data):
 
     quiz = quizzes[quiz_id]
 
-    game["quiz"] = quiz
-    game["current_question"] = -1
-    game["state"] = "lobby"
-    game["answers"] = {}
-    game["question_start_time"] = None
-    game["answer_history"] = {}
-
-    for player in game["players"].values():
-        player["score"] = 0
-        player["streak"] = 0
-        if not game["team_mode"]:
-            player["team"] = None
-
-    db.update_game(
-        game_code,
-        quiz_name=quiz["title"],
-        quiz=quiz,
-        current_question=-1,
-        state="lobby",
-    )
-    db.reset_game_progress(game_code, reset_teams=not game["team_mode"])
-
-    players = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+    players = apply_quiz_switch(game_code, quiz)
     await sio.emit("game_quiz_switched", {
         "code": game_code,
         "quiz_title": quiz["title"],
@@ -570,29 +577,7 @@ async def switch_custom_game_quiz(sid, data):
         await sio.emit("error", {"message": "Quizwechsel ist nur in der Lobby oder nach Spielende möglich"}, to=sid)
         return
 
-    game["quiz"] = quiz
-    game["current_question"] = -1
-    game["state"] = "lobby"
-    game["answers"] = {}
-    game["question_start_time"] = None
-    game["answer_history"] = {}
-
-    for player in game["players"].values():
-        player["score"] = 0
-        player["streak"] = 0
-        if not game["team_mode"]:
-            player["team"] = None
-
-    db.update_game(
-        game_code,
-        quiz_name=quiz["title"],
-        quiz=quiz,
-        current_question=-1,
-        state="lobby",
-    )
-    db.reset_game_progress(game_code, reset_teams=not game["team_mode"])
-
-    players = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+    players = apply_quiz_switch(game_code, quiz)
     await sio.emit("game_quiz_switched", {
         "code": game_code,
         "quiz_title": quiz["title"],
