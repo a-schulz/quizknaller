@@ -22,6 +22,9 @@ const loadLocalBtn = document.getElementById('load-local-btn');
 const downloadBtn = document.getElementById('download-btn');
 const uploadInput = document.getElementById('upload-input');
 const clearBtn = document.getElementById('clear-btn');
+const aiPromptInput = document.getElementById('ai-prompt');
+const aiGenerateBtn = document.getElementById('ai-generate-btn');
+const aiRefineBtn = document.getElementById('ai-refine-btn');
 const toast = document.getElementById('toast');
 
 // Initialize
@@ -35,6 +38,8 @@ function init() {
     downloadBtn.addEventListener('click', downloadAsJSON);
     uploadInput.addEventListener('change', handleFileUpload);
     clearBtn.addEventListener('click', clearAll);
+    aiGenerateBtn.addEventListener('click', () => runAiAssist(false));
+    aiRefineBtn.addEventListener('click', () => runAiAssist(true));
     
     // Show empty state
     updateUI();
@@ -369,6 +374,58 @@ function clearAll() {
     questions = [];
     updateUI();
     showToast('Alles gelöscht! 🗑️', 'success');
+}
+
+async function runAiAssist(refineExisting) {
+    const prompt = aiPromptInput.value.trim();
+    if (!prompt) {
+        showToast('Bitte gib zuerst einen KI-Prompt ein!', 'error');
+        aiPromptInput.focus();
+        return;
+    }
+
+    if (refineExisting && questions.length === 0) {
+        showToast('Zum Verfeinern brauchst du zuerst ein Quiz.', 'error');
+        return;
+    }
+
+    aiGenerateBtn.disabled = true;
+    aiRefineBtn.disabled = true;
+    showToast('KI arbeitet am Quiz... ⏳', 'success');
+
+    try {
+        const payload = { prompt };
+        if (refineExisting) {
+            payload.existing_quiz = getQuizData();
+        }
+
+        const response = await fetch('/api/ai/quiz-draft', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        let data;
+        try {
+            data = await response.json();
+        } catch (parseError) {
+            console.error('Failed to parse AI response:', parseError);
+            if (!response.ok) {
+                throw new Error(`Serveranfrage fehlgeschlagen (HTTP ${response.status})`);
+            }
+            throw new Error('KI-Antwort konnte nicht gelesen werden');
+        }
+        if (!response.ok || data?.error || !data?.quiz) {
+            throw new Error(data?.error || `Serveranfrage fehlgeschlagen (HTTP ${response.status})`);
+        }
+
+        loadQuizData(data.quiz);
+        showToast(refineExisting ? 'Quiz erfolgreich mit KI verfeinert! ✨' : 'Quiz erfolgreich mit KI erstellt! ✨', 'success');
+    } catch (e) {
+        showToast(`KI-Fehler: ${e.message}`, 'error');
+    } finally {
+        aiGenerateBtn.disabled = false;
+        aiRefineBtn.disabled = false;
+    }
 }
 
 function showToast(message, type = 'success') {

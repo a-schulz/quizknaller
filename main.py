@@ -17,6 +17,10 @@ sys.path = [p for p in sys.path if _should_keep_path(p)]
 import asyncio
 import io
 import json
+import os
+import re
+import urllib.error
+import urllib.request
 import uuid
 from pathlib import Path
 
@@ -25,6 +29,7 @@ import socketio
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 import database as db
 
@@ -50,6 +55,10 @@ MAX_READING_TIME = 8  # maximum seconds for reading phase
 DEFAULT_INACTIVITY_THRESHOLD = 3  # default number of questions without answer to be considered inactive
 MIN_TIME_LIMIT = 5  # minimum time limit for questions in seconds
 MAX_TIME_LIMIT = 120  # maximum time limit for questions in seconds
+OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+OPENROUTER_TEMPERATURE = 0.7
+OPENROUTER_REQUEST_TIMEOUT = int(os.getenv("OPENROUTER_REQUEST_TIMEOUT", "30"))
 
 # Load quiz data
 QUIZ_FILE = Path(__file__).parent / "quizzes.json"
@@ -60,6 +69,115 @@ def load_quizzes() -> list[dict]:
         with open(QUIZ_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return []
+
+
+def validate_custom_quiz(quiz: dict) -> str | None:
+    """Validate custom quiz payload. Returns error message when invalid."""
+    if (
+        not quiz
+        or not quiz.get("title")
+        or not isinstance(quiz.get("title"), str)
+        or not quiz.get("title").strip()
+        or not isinstance(quiz.get("questions"), list)
+    ):
+        return "Ungültiges Quiz-Format"
+
+    for i, q in enumerate(quiz["questions"]):
+        if (
+            not q.get("question")
+            or not isinstance(q.get("question"), str)
+            or not q.get("question").strip()
+            or not isinstance(q.get("answers"), list)
+            or len(q.get("answers", [])) != 4
+            or not all(isinstance(a, str) and a.strip() for a in q.get("answers", []))
+            or not isinstance(q.get("correct"), int)
+            or q.get("correct") < 0
+            or q.get("correct") > 3
+            or not isinstance(q.get("time_limit"), int)
+            or q.get("time_limit") < MIN_TIME_LIMIT
+            or q.get("time_limit") > MAX_TIME_LIMIT
+        ):
+            return f"Ungültiges Fragen-Format bei Frage {i + 1}"
+
+    return None
+
+
+def _extract_json_content(content: str) -> str:
+    """Extract JSON body from plain text or markdown fenced response."""
+    fenced = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", content)
+    if fenced:
+        return fenced.group(1).strip()
+    return content.strip()
+
+
+def _generate_quiz_with_openrouter(prompt: str, existing_quiz: dict | None) -> dict:
+    api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    if not api_key:
+        raise ValueError("OPENROUTER_API_KEY ist nicht gesetzt. Bitte API-Key unter https://openrouter.ai erstellen und als Umgebungsvariable setzen.")
+
+    system_prompt = (
+        "Du erstellst Quiz-Daten als reines JSON Objekt (ohne Markdown). "
+        "Gib exakt dieses Format zurück: "
+        '{"title":"...","questions":[{"question":"...","answers":["...","...","...","..."],"correct":0,"time_limit":20}]}. '
+        f"Es müssen immer genau 4 Antworten enthalten sein, correct muss 0-3 sein und time_limit zwischen {MIN_TIME_LIMIT} und {MAX_TIME_LIMIT}."
+    )
+    if existing_quiz:
+        user_prompt = (
+            "Verfeinere das vorhandene Quiz basierend auf diesem Prompt. "
+            "Verbessere Struktur und Qualität, erhalte aber das geforderte JSON-Format.\n\n"
+            f"Prompt:\n{prompt}\n\nVorhandenes Quiz:\n{json.dumps(existing_quiz, ensure_ascii=False)}"
+        )
+    else:
+        user_prompt = f"Erstelle ein neues Quiz basierend auf diesem Prompt:\n{prompt}"
+
+    payload = {
+        "model": OPENROUTER_MODEL,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "temperature": OPENROUTER_TEMPERATURE,
+    }
+    request = urllib.request.Request(
+        OPENROUTER_API_URL,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=OPENROUTER_REQUEST_TIMEOUT) as response:
+            raw_body = response.read().decode("utf-8")
+    except urllib.error.HTTPError as exc:
+        raise ValueError(f"OpenRouter HTTP Fehler ({exc.code})")
+    except urllib.error.URLError as exc:
+        raise ValueError(f"OpenRouter Verbindungsfehler: {exc.reason}")
+
+    parsed = json.loads(raw_body)
+    content = (
+        parsed.get("choices", [{}])[0]
+        .get("message", {})
+        .get("content", "")
+    )
+    if not content:
+        raise ValueError("OpenRouter hat keine Antwort zurückgegeben")
+
+    try:
+        quiz = json.loads(_extract_json_content(content))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"KI-Antwort enthält kein gültiges JSON: {exc.msg}")
+    validation_error = validate_custom_quiz(quiz)
+    if validation_error:
+        raise ValueError(f"KI-Antwort hat ungültiges Quiz-Format: {validation_error}")
+    return quiz
+
+
+class QuizAiRequest(BaseModel):
+    prompt: str
+    existing_quiz: dict | None = None
 
 
 def calculate_reading_time(text: str) -> float:
@@ -126,6 +244,26 @@ async def get_quizzes():
     """Get available quizzes."""
     quizzes = load_quizzes()
     return [{"id": i, "title": q["title"], "questionCount": len(q["questions"])} for i, q in enumerate(quizzes)]
+
+
+@app.post("/api/ai/quiz-draft")
+async def generate_ai_quiz(payload: QuizAiRequest):
+    """Generate or refine a quiz using OpenRouter AI."""
+    prompt = payload.prompt.strip()
+    if not prompt:
+        return {"error": "Prompt darf nicht leer sein"}
+
+    if payload.existing_quiz:
+        validation_error = validate_custom_quiz(payload.existing_quiz)
+        if validation_error:
+            return {"error": f"Vorhandenes Quiz ist ungültig: {validation_error}"}
+
+    try:
+        quiz = await asyncio.to_thread(_generate_quiz_with_openrouter, prompt, payload.existing_quiz)
+    except (ValueError, json.JSONDecodeError) as exc:
+        return {"error": str(exc)}
+
+    return {"quiz": quiz}
 
 
 # Socket.IO events
@@ -410,28 +548,10 @@ async def create_custom_game(sid, data):
         await sio.emit("error", {"message": "Quiz-Daten fehlen"}, to=sid)
         return
     
-    # Validate quiz structure
-    if (not quiz.get("title") or 
-        not isinstance(quiz.get("title"), str) or 
-        not quiz.get("title").strip() or 
-        not isinstance(quiz.get("questions"), list)):
-        await sio.emit("error", {"message": "Ungültiges Quiz-Format"}, to=sid)
+    validation_error = validate_custom_quiz(quiz)
+    if validation_error:
+        await sio.emit("error", {"message": validation_error}, to=sid)
         return
-    
-    # Validate questions
-    for i, q in enumerate(quiz["questions"]):
-        if (not q.get("question") or 
-            not isinstance(q.get("question"), str) or
-            not q.get("question").strip() or
-            not isinstance(q.get("answers"), list) or 
-            len(q.get("answers", [])) != 4 or
-            not all(isinstance(a, str) and a.strip() for a in q.get("answers", [])) or
-            not isinstance(q.get("correct"), int) or
-            q.get("correct") < 0 or q.get("correct") > 3 or
-            not isinstance(q.get("time_limit"), int) or
-            q.get("time_limit") < MIN_TIME_LIMIT or q.get("time_limit") > MAX_TIME_LIMIT):
-            await sio.emit("error", {"message": f"Ungültiges Fragen-Format bei Frage {i + 1}"}, to=sid)
-            return
     
     game_code = generate_game_code()
     
@@ -548,26 +668,10 @@ async def switch_custom_game_quiz(sid, data):
         await sio.emit("error", {"message": "Quiz-Daten fehlen"}, to=sid)
         return
 
-    if (not quiz.get("title") or
-        not isinstance(quiz.get("title"), str) or
-        not quiz.get("title").strip() or
-        not isinstance(quiz.get("questions"), list)):
-        await sio.emit("error", {"message": "Ungültiges Quiz-Format"}, to=sid)
+    validation_error = validate_custom_quiz(quiz)
+    if validation_error:
+        await sio.emit("error", {"message": validation_error}, to=sid)
         return
-
-    for i, q in enumerate(quiz["questions"]):
-        if (not q.get("question") or
-            not isinstance(q.get("question"), str) or
-            not q.get("question").strip() or
-            not isinstance(q.get("answers"), list) or
-            len(q.get("answers", [])) != 4 or
-            not all(isinstance(a, str) and a.strip() for a in q.get("answers", [])) or
-            not isinstance(q.get("correct"), int) or
-            q.get("correct") < 0 or q.get("correct") > 3 or
-            not isinstance(q.get("time_limit"), int) or
-            q.get("time_limit") < MIN_TIME_LIMIT or q.get("time_limit") > MAX_TIME_LIMIT):
-            await sio.emit("error", {"message": f"Ungültiges Fragen-Format bei Frage {i + 1}"}, to=sid)
-            return
 
     game = games[game_code]
     if game["host_sid"] != sid:
