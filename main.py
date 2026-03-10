@@ -57,6 +57,8 @@ MIN_TIME_LIMIT = 5  # minimum time limit for questions in seconds
 MAX_TIME_LIMIT = 120  # maximum time limit for questions in seconds
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+OPENROUTER_TEMPERATURE = 0.7
+OPENROUTER_REQUEST_TIMEOUT = int(os.getenv("OPENROUTER_REQUEST_TIMEOUT", "30"))
 
 # Load quiz data
 QUIZ_FILE = Path(__file__).parent / "quizzes.json"
@@ -102,16 +104,16 @@ def validate_custom_quiz(quiz: dict) -> str | None:
 
 def _extract_json_content(content: str) -> str:
     """Extract JSON body from plain text or markdown fenced response."""
-    fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", content, re.DOTALL)
+    fenced = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", content)
     if fenced:
-        return fenced.group(1)
+        return fenced.group(1).strip()
     return content.strip()
 
 
 def _generate_quiz_with_openrouter(prompt: str, existing_quiz: dict | None) -> dict:
     api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
     if not api_key:
-        raise ValueError("OPENROUTER_API_KEY ist nicht gesetzt")
+        raise ValueError("OPENROUTER_API_KEY ist nicht gesetzt. Bitte API-Key unter https://openrouter.ai erstellen und als Umgebungsvariable setzen.")
 
     system_prompt = (
         "Du erstellst Quiz-Daten als reines JSON Objekt (ohne Markdown). "
@@ -134,7 +136,7 @@ def _generate_quiz_with_openrouter(prompt: str, existing_quiz: dict | None) -> d
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        "temperature": 0.7,
+        "temperature": OPENROUTER_TEMPERATURE,
     }
     request = urllib.request.Request(
         OPENROUTER_API_URL,
@@ -147,11 +149,10 @@ def _generate_quiz_with_openrouter(prompt: str, existing_quiz: dict | None) -> d
     )
 
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with urllib.request.urlopen(request, timeout=OPENROUTER_REQUEST_TIMEOUT) as response:
             raw_body = response.read().decode("utf-8")
     except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="ignore")
-        raise ValueError(f"OpenRouter HTTP Fehler ({exc.code}): {detail[:300]}")
+        raise ValueError(f"OpenRouter HTTP Fehler ({exc.code})")
     except urllib.error.URLError as exc:
         raise ValueError(f"OpenRouter Verbindungsfehler: {exc.reason}")
 
@@ -164,7 +165,10 @@ def _generate_quiz_with_openrouter(prompt: str, existing_quiz: dict | None) -> d
     if not content:
         raise ValueError("OpenRouter hat keine Antwort zurückgegeben")
 
-    quiz = json.loads(_extract_json_content(content))
+    try:
+        quiz = json.loads(_extract_json_content(content))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"KI-Antwort enthält kein gültiges JSON: {exc.msg}")
     validation_error = validate_custom_quiz(quiz)
     if validation_error:
         raise ValueError(f"KI-Antwort hat ungültiges Quiz-Format: {validation_error}")

@@ -404,9 +404,18 @@ async function runAiAssist(refineExisting) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        const data = await response.json();
-        if (!response.ok || data.error || !data.quiz) {
-            throw new Error(data.error || 'KI-Antwort ungültig');
+        let data;
+        try {
+            data = await response.json();
+        } catch (parseError) {
+            console.error('Failed to parse AI response:', parseError);
+            if (!response.ok) {
+                throw new Error(`Serveranfrage fehlgeschlagen (HTTP ${response.status})`);
+            }
+            throw new Error('KI-Antwort konnte nicht gelesen werden');
+        }
+        if (!response.ok || data?.error || !data?.quiz) {
+            throw new Error(data?.error || `Serveranfrage fehlgeschlagen (HTTP ${response.status})`);
         }
 
         loadQuizData(data.quiz);
