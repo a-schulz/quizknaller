@@ -125,7 +125,15 @@ async def get_qrcode(request: Request, code: str):
 async def get_quizzes():
     """Get available quizzes."""
     quizzes = load_quizzes()
-    return [{"id": i, "title": q["title"], "questionCount": len(q["questions"])} for i, q in enumerate(quizzes)]
+    return [
+        {
+            "id": i,
+            "title": q["title"],
+            "questionCount": len(q["questions"]),
+            "category": q.get("category", ""),
+        }
+        for i, q in enumerate(quizzes)
+    ]
 
 
 # Socket.IO events

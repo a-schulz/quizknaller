@@ -90,7 +90,8 @@
         "correct": 2,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Allgemeinwissen"
   },
   {
     "title": "Technik & Internet Quiz 🖥️",
@@ -150,7 +151,8 @@
         "correct": 0,
         "time_limit": 20
       }
-    ]
+    ],
+    "category": "Technik"
   },
   {
     "title": "Musik & Film Spektakel 🎬",
@@ -210,7 +212,8 @@
         "correct": 2,
         "time_limit": 20
       }
-    ]
+    ],
+    "category": "Musik & Film"
   },
   {
     "title": "Weihnachtsquiz 🎄🎅",
@@ -380,7 +383,8 @@
         "correct": 1,
         "time_limit": 10
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Weihnachtsfilme & Musik 🎬🎵",
@@ -517,7 +521,8 @@
         "correct": 1,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Weihnachten International 🌍🎄",
@@ -654,7 +659,8 @@
         "correct": 2,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Weihnachts-Geschichte & Brauchtum 📜✨",
@@ -791,7 +797,8 @@
         "correct": 1,
         "time_limit": 20
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Weihnachts-Knobeleien 🧠🎅",
@@ -928,7 +935,8 @@
         "correct": 2,
         "time_limit": 20
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Weihnachts-Tech-Knobelei 🤖🎄",
@@ -1065,7 +1073,8 @@
         "correct": 2,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Kuriose Weihnachts-Facts 🎅🌍",
@@ -1202,7 +1211,8 @@
         "correct": 1,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Weihnachtsfeier 🎅🌍",
@@ -1427,7 +1437,8 @@
         "correct": 1,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Weihnachtsmann & Co. KG 🎅🏭",
@@ -1564,7 +1575,8 @@
         "correct": 1,
         "time_limit": 20
       }
-    ]
+    ],
+    "category": "Weihnachten"
   },
   {
     "title": "Geographie Quiz 🌍",
@@ -1734,7 +1746,8 @@
         "correct": 1,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Geographie"
   },
   {
     "title": "Topographie Quiz 🗺️",
@@ -1904,7 +1917,8 @@
         "correct": 1,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Geographie"
   },
   {
     "title": "Marken Quiz 🏷️",
@@ -2074,7 +2088,8 @@
         "correct": 1,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Allgemeinwissen"
   },
   {
     "title": "Allgemeinwissen 2.0 🧠",
@@ -2244,7 +2259,8 @@
         "correct": 1,
         "time_limit": 10
       }
-    ]
+    ],
+    "category": "Allgemeinwissen"
   },
   {
     "title": "Biermarken Quiz 🍺",
@@ -2414,7 +2430,8 @@
         "correct": 1,
         "time_limit": 10
       }
-    ]
+    ],
+    "category": "Essen & Trinken"
   },
   {
     "title": "Getränke Quiz 🧃",
@@ -2584,7 +2601,8 @@
         "correct": 1,
         "time_limit": 10
       }
-    ]
+    ],
+    "category": "Essen & Trinken"
   },
   {
     "title": "Sport Quiz ⚽",
@@ -2754,7 +2772,8 @@
         "correct": 1,
         "time_limit": 20
       }
-    ]
+    ],
+    "category": "Sport"
   },
   {
     "title": "Essen & Kochen 🍕",
@@ -2924,7 +2943,8 @@
         "correct": 2,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Essen & Trinken"
   },
   {
     "title": "Filme & Serien 🎬",
@@ -3094,6 +3114,7 @@
         "correct": 2,
         "time_limit": 15
       }
-    ]
+    ],
+    "category": "Musik & Film"
   }
 ]
