@@ -29,6 +29,14 @@
                     <label for="quiz-title">Quiz-Titel *</label>
                     <input type="text" id="quiz-title" placeholder="z.B. Mein Wissens-Quiz 🎯" required>
                 </div>
+                <div class="form-group">
+                    <label for="ai-prompt">🤖 KI-Prompt (OpenRouter)</label>
+                    <textarea id="ai-prompt" placeholder="z.B. Erstelle ein 8-Fragen-Quiz über Europa für Erwachsene, mittlerer Schwierigkeitsgrad..."></textarea>
+                </div>
+                <div class="ai-actions">
+                    <button id="ai-generate-btn" class="btn-action btn-primary">✨ Neues Quiz mit KI</button>
+                    <button id="ai-refine-btn" class="btn-action btn-secondary">🛠️ Mit KI verfeinern</button>
+                </div>
             </div>
 
             <!-- Questions Section -->

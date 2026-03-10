@@ -20,12 +20,16 @@ Ein Kahoot-ähnliches Quiz-Spiel mit einer mobil-optimierten Spieleransicht und 
 - 💾 **SQLite Persistenz** - Spieldaten werden in Datenbank gespeichert
 - 🔄 **Reconnect-Funktion** - Spieler können nach Verbindungsabbruch wieder einsteigen
 - 🔁 **Quizwechsel ohne neuen Code** - Host kann in derselben Session ein neues Quiz wählen, Spieler bleiben verbunden
+- 🤖 **KI-gestützter Quiz-Editor (OpenRouter)** - Entwürfe erzeugen und bestehende Quizze per Prompt verfeinern
 
 ## Schnellstart (Lokal)
 
 ```bash
 # Abhängigkeiten installieren
 uv sync
+
+# OpenRouter API Key für KI-Quiz-Erstellung (optional, nur für /creator nötig)
+export OPENROUTER_API_KEY="dein_key"
 
 # Server starten
 uv run python main.py
