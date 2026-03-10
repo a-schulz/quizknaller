@@ -1481,3 +1481,24 @@ html, body {
         font-size: 0.9rem;
     }
 }
+
+@media (max-width: 480px) {
+    .lobby-main {
+        padding: 12px;
+    }
+
+    .join-info {
+        padding: 14px;
+    }
+
+    .qr-code {
+        width: 140px;
+        height: 140px;
+    }
+
+    .code-value {
+        font-size: 2rem;
+        letter-spacing: 3px;
+        padding: 10px 14px;
+    }
+}
