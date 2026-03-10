@@ -17,6 +17,11 @@ let autoplayEnabled = false;
 let autoplayTimeout = null;
 let autoplayCountdownInterval = null;
 
+// Quiz filter state
+let allDefaultQuizzes = [];
+let activeCategory = '';
+let searchQuery = '';
+
 // DOM Elements
 const screens = {
     select: document.getElementById('select-screen'),
@@ -29,6 +34,8 @@ const screens = {
 
 const elements = {
     quizList: document.getElementById('quiz-list'),
+    quizSearch: document.getElementById('quiz-search'),
+    categoryFilters: document.getElementById('category-filters'),
     uploadQuizBtn: document.getElementById('upload-quiz-btn'),
     uploadQuizInput: document.getElementById('upload-quiz-input'),
     lobbyQuizTitle: document.getElementById('lobby-quiz-title'),
@@ -151,22 +158,57 @@ function deleteCustomQuiz(quizId) {
 // Load quizzes
 async function loadQuizzes() {
     const response = await fetch('/api/quizzes');
-    const defaultQuizzes = await response.json();
+    allDefaultQuizzes = await response.json();
+    buildCategoryFilters(allDefaultQuizzes);
+    renderQuizList();
+}
+
+function buildCategoryFilters(quizzes) {
+    const categories = [...new Set(quizzes.map(q => q.category).filter(c => c !== ''))].sort();
+    const container = elements.categoryFilters;
+    container.innerHTML = '<button class="category-pill active" data-category="">Alle</button>';
+    categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'category-pill';
+        btn.dataset.category = cat;
+        btn.textContent = cat;
+        container.appendChild(btn);
+    });
+}
+
+function renderQuizList() {
+    const query = searchQuery.trim().toLowerCase();
     const customQuizzes = getCustomQuizzes();
-    
+
+    const filteredDefault = allDefaultQuizzes.filter(quiz => {
+        const matchesCategory = !activeCategory || quiz.category === activeCategory;
+        const matchesSearch = !query || quiz.title.toLowerCase().includes(query);
+        return matchesCategory && matchesSearch;
+    });
+
+    const filteredCustom = customQuizzes.filter(quiz => {
+        if (!query) return true;
+        return quiz.title.toLowerCase().includes(query);
+    });
+
     elements.quizList.innerHTML = '';
-    
-    // Add default quizzes
-    defaultQuizzes.forEach(quiz => {
+
+    filteredDefault.forEach(quiz => {
         const card = createQuizCard(quiz, false);
         elements.quizList.appendChild(card);
     });
-    
-    // Add custom quizzes
-    customQuizzes.forEach(quiz => {
+
+    filteredCustom.forEach(quiz => {
         const card = createQuizCard(quiz, true);
         elements.quizList.appendChild(card);
     });
+
+    if (filteredDefault.length === 0 && filteredCustom.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'quiz-list-empty';
+        empty.textContent = 'Kein Quiz gefunden.';
+        elements.quizList.appendChild(empty);
+    }
 }
 
 function createQuizCard(quiz, isCustom) {
@@ -176,10 +218,15 @@ function createQuizCard(quiz, isCustom) {
     const questionCount = isCustom 
         ? quiz.questions.length 
         : quiz.questionCount;
+
+    const categoryBadge = (!isCustom && quiz.category)
+        ? `<span class="quiz-category-badge">${escapeHtml(quiz.category)}</span>`
+        : '';
     
     card.innerHTML = `
         <h3>${escapeHtml(quiz.title)}</h3>
         <span>${questionCount} Fragen</span>
+        ${categoryBadge}
         ${isCustom ? '<button class="delete-quiz-btn" aria-label="Quiz löschen" title="Quiz löschen">🗑️</button>' : ''}
     `;
     
@@ -214,7 +261,7 @@ function createQuizCard(quiz, isCustom) {
             e.stopPropagation();
             if (confirm(`Möchtest du das Quiz "${quiz.title}" wirklich löschen?`)) {
                 deleteCustomQuiz(quiz.id);
-                loadQuizzes();
+                renderQuizList();
             }
         });
     }
@@ -292,7 +339,7 @@ function handleQuizUpload(event) {
             
             if (addedCount > 0) {
                 alert(`${addedCount} Quiz(ze) erfolgreich hochgeladen! ⬆️`);
-                loadQuizzes();
+                renderQuizList();
             }
         } catch (e) {
             alert('Fehler beim Lesen der Datei: ' + e.message);
@@ -309,6 +356,22 @@ elements.uploadQuizBtn.addEventListener('click', () => {
 });
 
 elements.uploadQuizInput.addEventListener('change', handleQuizUpload);
+
+// Quiz search handler
+elements.quizSearch.addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    renderQuizList();
+});
+
+// Category filter handler (delegated, attached once)
+elements.categoryFilters.addEventListener('click', (e) => {
+    const pill = e.target.closest('.category-pill');
+    if (!pill) return;
+    elements.categoryFilters.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
+    pill.classList.add('active');
+    activeCategory = pill.dataset.category;
+    renderQuizList();
+});
 
 // Initialize
 loadQuizzes();
