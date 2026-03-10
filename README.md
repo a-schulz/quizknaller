@@ -19,6 +19,7 @@ Ein Kahoot-ähnliches Quiz-Spiel mit einer mobil-optimierten Spieleransicht und 
 - 🏆 **Podium & Konfetti** - Feierliches Spielende
 - 💾 **SQLite Persistenz** - Spieldaten werden in Datenbank gespeichert
 - 🔄 **Reconnect-Funktion** - Spieler können nach Verbindungsabbruch wieder einsteigen
+- 🔁 **Quizwechsel ohne neuen Code** - Host kann in derselben Session ein neues Quiz wählen, Spieler bleiben verbunden
 
 ## Schnellstart (Lokal)
 

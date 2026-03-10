@@ -370,6 +370,35 @@ def update_player_team(game_code: str, name: str, team: str) -> bool:
         return False
 
 
+def reset_game_progress(game_code: str, reset_teams: bool = False) -> bool:
+    """Reset player scores and answer history for a game."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        if reset_teams:
+            cursor.execute("""
+                UPDATE players
+                SET score = 0, team = NULL, updated_at = CURRENT_TIMESTAMP
+                WHERE game_code = ?
+            """, (game_code,))
+        else:
+            cursor.execute("""
+                UPDATE players
+                SET score = 0, updated_at = CURRENT_TIMESTAMP
+                WHERE game_code = ?
+            """, (game_code,))
+
+        cursor.execute("DELETE FROM question_responses WHERE game_code = ?", (game_code,))
+
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error resetting game progress: {e}")
+        return False
+
+
 def set_player_connected(session_id: str, connected: bool) -> bool:
     """Set player connection status."""
     try:

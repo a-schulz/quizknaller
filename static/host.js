@@ -192,10 +192,18 @@ function createQuizCard(quiz, isCustom) {
         }
         
         if (isCustom) {
-            // Create game with custom quiz data
-            socket.emit('create_custom_game', { quiz: quiz });
+            if (gameCode) {
+                socket.emit('switch_custom_game_quiz', { code: gameCode, quiz: quiz });
+            } else {
+                // Create game with custom quiz data
+                socket.emit('create_custom_game', { quiz: quiz });
+            }
         } else {
-            socket.emit('create_game', { quiz_id: quiz.id });
+            if (gameCode) {
+                socket.emit('switch_game_quiz', { code: gameCode, quiz_id: quiz.id });
+            } else {
+                socket.emit('create_game', { quiz_id: quiz.id });
+            }
         }
     });
     
@@ -576,10 +584,6 @@ elements.nextQuestionBtn.addEventListener('click', () => {
 });
 
 elements.newGameBtn.addEventListener('click', () => {
-    gameCode = null;
-    localStorage.removeItem('hostGameCode');
-    localStorage.removeItem('hostQuizTitle');
-    updateHeaderGameCodes(null);
     loadQuizzes();
     showScreen('select');
 });
@@ -602,6 +606,21 @@ socket.on('game_created', (data) => {
     // Update header game codes
     updateHeaderGameCodes(data.code);
     
+    showScreen('lobby');
+});
+
+socket.on('game_quiz_switched', (data) => {
+    gameCode = data.code;
+    localStorage.setItem('hostGameCode', data.code);
+    localStorage.setItem('hostQuizTitle', data.quiz_title);
+
+    elements.lobbyQuizTitle.textContent = data.quiz_title;
+    elements.joinUrl.textContent = window.location.host;
+    elements.gameCodeDisplay.textContent = data.code;
+    elements.qrCode.src = `/api/qrcode?code=${data.code}`;
+    updateHeaderGameCodes(data.code);
+    updatePlayerDisplay(data.players || []);
+
     showScreen('lobby');
 });
 
