@@ -463,6 +463,154 @@ async def create_custom_game(sid, data):
 
 
 @sio.event
+async def switch_game_quiz(sid, data):
+    """Host switches the quiz within an existing game session."""
+    game_code = data.get("code")
+    quiz_id = data.get("quiz_id", 0)
+    quizzes = load_quizzes()
+
+    if game_code not in games:
+        await sio.emit("error", {"message": "Spiel nicht gefunden"}, to=sid)
+        return
+
+    if quiz_id >= len(quizzes):
+        await sio.emit("error", {"message": "Quiz nicht gefunden"}, to=sid)
+        return
+
+    game = games[game_code]
+    if game["host_sid"] != sid:
+        return
+
+    if game["state"] not in ("lobby", "ended"):
+        await sio.emit("error", {"message": "Quizwechsel ist nur in der Lobby oder nach Spielende möglich"}, to=sid)
+        return
+
+    quiz = quizzes[quiz_id]
+
+    game["quiz"] = quiz
+    game["current_question"] = -1
+    game["state"] = "lobby"
+    game["answers"] = {}
+    game["question_start_time"] = None
+    game["answer_history"] = {}
+
+    for player in game["players"].values():
+        player["score"] = 0
+        player["streak"] = 0
+        if not game["team_mode"]:
+            player["team"] = None
+
+    db.update_game(
+        game_code,
+        quiz_name=quiz["title"],
+        quiz=quiz,
+        current_question=-1,
+        state="lobby",
+    )
+    db.reset_game_progress(game_code, reset_teams=not game["team_mode"])
+
+    players = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+    await sio.emit("game_quiz_switched", {
+        "code": game_code,
+        "quiz_title": quiz["title"],
+        "question_count": len(quiz["questions"]),
+        "players": players,
+    }, to=sid)
+
+    for player_sid, player in game["players"].items():
+        await sio.emit("quiz_switched", {
+            "code": game_code,
+            "quiz_title": quiz["title"],
+            "team_mode": game["team_mode"],
+            "teams": game["teams"],
+            "team": player["team"],
+        }, to=player_sid)
+
+
+@sio.event
+async def switch_custom_game_quiz(sid, data):
+    """Host switches to a custom quiz within an existing game session."""
+    game_code = data.get("code")
+    quiz = data.get("quiz")
+
+    if game_code not in games:
+        await sio.emit("error", {"message": "Spiel nicht gefunden"}, to=sid)
+        return
+
+    if not quiz:
+        await sio.emit("error", {"message": "Quiz-Daten fehlen"}, to=sid)
+        return
+
+    if (not quiz.get("title") or
+        not isinstance(quiz.get("title"), str) or
+        not quiz.get("title").strip() or
+        not isinstance(quiz.get("questions"), list)):
+        await sio.emit("error", {"message": "Ungültiges Quiz-Format"}, to=sid)
+        return
+
+    for i, q in enumerate(quiz["questions"]):
+        if (not q.get("question") or
+            not isinstance(q.get("question"), str) or
+            not q.get("question").strip() or
+            not isinstance(q.get("answers"), list) or
+            len(q.get("answers", [])) != 4 or
+            not all(isinstance(a, str) and a.strip() for a in q.get("answers", [])) or
+            not isinstance(q.get("correct"), int) or
+            q.get("correct") < 0 or q.get("correct") > 3 or
+            not isinstance(q.get("time_limit"), int) or
+            q.get("time_limit") < MIN_TIME_LIMIT or q.get("time_limit") > MAX_TIME_LIMIT):
+            await sio.emit("error", {"message": f"Ungültiges Fragen-Format bei Frage {i + 1}"}, to=sid)
+            return
+
+    game = games[game_code]
+    if game["host_sid"] != sid:
+        return
+
+    if game["state"] not in ("lobby", "ended"):
+        await sio.emit("error", {"message": "Quizwechsel ist nur in der Lobby oder nach Spielende möglich"}, to=sid)
+        return
+
+    game["quiz"] = quiz
+    game["current_question"] = -1
+    game["state"] = "lobby"
+    game["answers"] = {}
+    game["question_start_time"] = None
+    game["answer_history"] = {}
+
+    for player in game["players"].values():
+        player["score"] = 0
+        player["streak"] = 0
+        if not game["team_mode"]:
+            player["team"] = None
+
+    db.update_game(
+        game_code,
+        quiz_name=quiz["title"],
+        quiz=quiz,
+        current_question=-1,
+        state="lobby",
+    )
+    db.reset_game_progress(game_code, reset_teams=not game["team_mode"])
+
+    players = [{"name": p["name"], "score": p["score"], "team": p["team"]} for p in game["players"].values()]
+    await sio.emit("game_quiz_switched", {
+        "code": game_code,
+        "quiz_title": quiz["title"],
+        "question_count": len(quiz["questions"]),
+        "players": players,
+    }, to=sid)
+
+    for player_sid, player in game["players"].items():
+        await sio.emit("quiz_switched", {
+            "code": game_code,
+            "quiz_title": quiz["title"],
+            "team_mode": game["team_mode"],
+            "teams": game["teams"],
+            "team": player["team"],
+        }, to=player_sid)
+
+
+@sio.event
 async def join_game(sid, data):
     """Player joins a game."""
     game_code = data.get("code", "").upper()

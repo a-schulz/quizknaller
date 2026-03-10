@@ -254,6 +254,20 @@ socket.on('joined_game', (data) => {
     }
 });
 
+socket.on('quiz_switched', (data) => {
+    gameCode = data.code;
+    localStorage.setItem('playerGameCode', data.code);
+    localStorage.setItem('playerQuizTitle', data.quiz_title);
+
+    elements.waitingQuizTitle.textContent = data.quiz_title;
+
+    if (data.team_mode && data.teams && data.teams.length > 0 && !data.team) {
+        showTeamSelection(data.teams);
+    } else {
+        showScreen('waiting');
+    }
+});
+
 function showTeamSelection(teams) {
     elements.teamList.innerHTML = '';
     teams.forEach(team => {
